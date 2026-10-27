@@ -34,7 +34,7 @@ def ssc_subjects(group):
         ("Bangla", 200), ("English", 200), ("Mathematics", 100), (g1, 100),
         ("Religion", 100), (g2, 100), (g3, 100), ("Compulsory", 100),
         ("ICT", 50), ("Optional", 100), ("Physical Education", 100),
-        ("Career Education", 100),
+        ("Career Education", 50),
     ]
 
 
@@ -138,6 +138,24 @@ def build(year, group):
     subj_def = HSC_SUBJECTS if is_hsc else ssc_subjects(group)
     width = len(subj_def)
     marks_map = parse_individual(ind_path, width)
+
+    # ── SSC 2026 quirk ────────────────────────────────────────────────────
+    # The source stores Physical Education (column 10) already halved, and the
+    # published totals are short by exactly that missing half — 2026's mean total
+    # is ~58 below 2024/25 until it is restored. Un-halve the mark (capped at the
+    # 100 full mark, for the few rows the source left unscaled) and add the
+    # difference back to the total, so the breakdown always sums to the total.
+    PE_COL = 10
+    if year == "2026" and not is_hsc and marks_map and width > PE_COL:
+        for r in rows:
+            m = marks_map.get(r["roll"])
+            if not m or len(m) != width:
+                continue
+            stored = m[PE_COL]
+            shown = min(100, stored * 2)
+            m[PE_COL] = shown
+            if r["total"] is not None:
+                r["total"] += shown - stored
 
     # ---- rank: total desc -> gpa desc -> roll asc, ties share the rank ----
     rows.sort(key=lambda r: (-(r["total"] or 0), -(r["gpa"] or 0), r["roll"]))

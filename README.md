@@ -109,11 +109,21 @@ subject label/full-marks layout (`ssc_subjects()` / `HSC_SUBJECTS`).
 
 | Exam | Columns (roll, then…) |
 |---|---|
-| SSC | Bangla 200 · English 200 · Mathematics 100 · *group subject* 100 · Religion 100 · *group subject* 100 · *group subject* 100 · Compulsory 100 · ICT 50 · Optional 100 · Physical Education 100 · Career Education 100 |
+| SSC | Bangla 200 · English 200 · Mathematics 100 · *group subject* 100 · Religion 100 · *group subject* 100 · *group subject* 100 · Compulsory 100 · ICT 50 · Optional 100 · Physical Education 100 · Career Education **50** |
 | HSC | Bangla 200 · English 200 · ICT 100 · Physics 200 · Chemistry 200 · Compulsory 200 · Optional 200 |
 
 Group subjects — **Science**: BGS / Physics / Chemistry · **Commerce**: Science / Accounting /
 Finance · **Arts**: Science / Geography / Civics.
+
+### Known source quirks (corrected in `tools/build_data.py`)
+
+| Quirk | Evidence | Fix |
+|---|---|---|
+| **Career Education** is a 50-mark subject, not 100 | Its value never exceeds 50 in any SSC year | Full mark set to 50 for all SSC datasets |
+| **SSC 2026 Physical Education is stored halved** | 2026 PE median 50 / mean 49.8 vs 98–100 in every other year; 2026 totals sat ~58 below 2024/25 until restored | `PE = min(100, PE × 2)` and the difference added back to the total, so the breakdown always sums to the total |
+
+The 2026 correction reorders that year (median 38 places, 99th pct 1,675) because the published
+totals were short by a varying amount — that is the point of the fix, not a side effect.
 
 ### Packed file format
 
