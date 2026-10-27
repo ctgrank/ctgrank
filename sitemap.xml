@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://example.github.io/shikhor/</loc><priority>1.0</priority></url>
+  <url><loc>https://example.github.io/shikhor/?exam=HSC&year=2025&group=Science</loc><priority>0.7</priority></url>
+  <url><loc>https://example.github.io/shikhor/?exam=HSC&year=2025&group=Commerce</loc><priority>0.7</priority></url>
+  <url><loc>https://example.github.io/shikhor/?exam=HSC&year=2025&group=Arts</loc><priority>0.7</priority></url>
+  <url><loc>https://example.github.io/shikhor/?exam=HSC&year=2024&group=Science</loc><priority>0.7</priority></url>
+  <url><loc>https://example.github.io/shikhor/?exam=HSC&year=2024&group=Commerce</loc><priority>0.7</priority></url>
+  <url><loc>https://example.github.io/shikhor/?exam=HSC&year=2024&group=Arts</loc><priority>0.7</priority></url>
+  <url><loc>https://example.github.io/shikhor/?exam=HSC&year=2023&group=Science</loc><priority>0.7</priority></url>
+  <url><loc>https://example.github.io/shikhor/?exam=SSC&year=2026&group=Science</loc><priority>0.7</priority></url>
+  <url><loc>https://example.github.io/shikhor/?exam=SSC&year=2025&group=Science</loc><priority>0.7</priority></url>
+  <url><loc>https://example.github.io/shikhor/?exam=SSC&year=2025&group=Arts</loc><priority>0.7</priority></url>
+  <url><loc>https://example.github.io/shikhor/?exam=SSC&year=2024&group=Science</loc><priority>0.7</priority></url>
+  <url><loc>https://example.github.io/shikhor/?exam=SSC&year=2024&group=Commerce</loc><priority>0.7</priority></url>
+  <url><loc>https://example.github.io/shikhor/?exam=SSC&year=2024&group=Arts</loc><priority>0.7</priority></url>
+  <url><loc>https://example.github.io/shikhor/?exam=SSC&year=2023&group=Science</loc><priority>0.7</priority></url>
+  <url><loc>https://example.github.io/shikhor/?exam=SSC&year=2023&group=Commerce</loc><priority>0.7</priority></url>
+  <url><loc>https://example.github.io/shikhor/?exam=SSC&year=2023&group=Arts</loc><priority>0.7</priority></url>
+  <url><loc>https://example.github.io/shikhor/?exam=SSC&year=2022&group=Science</loc><priority>0.7</priority></url>
+</urlset>
