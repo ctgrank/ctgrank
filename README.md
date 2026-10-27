@@ -4,7 +4,7 @@
 
 **Unofficial SSC & HSC board-rank explorer for the Chattogram (Chittagong) Education Board.**
 
-*Shikhor* (শিখর) is Bengali for **summit** — the top of the merit list.
+*Shikhor* is Bengali for **summit** — the top of the merit list.
 
 A dependency-free static web app: pick an **exam → year → group**, then search ~480,000 ranked
 results by name, roll number or institution, open any student for their **subject-wise marks**,

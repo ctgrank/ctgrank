@@ -276,7 +276,7 @@ function paintRows() {
       const g = ds.gpa[i], t = ds.total[i];
       const cls = g >= 500 ? 'pill-g5' : g >= 400 ? 'pill-g4' : 'pill-g0';
       html += `<div class="row" data-i="${i}" style="top:${k * h}px" role="button" tabindex="0">
-        <span class="rk ${k < 3 ? 'top' : ''}">${nf(k + 1)}</span>
+        <span class="rk ${i < 3 ? 'top' : ''}">${nf(i + 1)}</span>
         <span class="rl">${ds.rollS[i]}</span>
         <span class="nm">${hl(ds.name[i], q)}</span>
         <span class="sc">${hl(ds.schools[ds.sid[i]], q)}</span>
@@ -310,7 +310,9 @@ function studentCard(i, forPrint) {
   const ds = S.ds, m = ds.meta;
   const roll = ds.roll[i], name = ds.name[i], g = ds.gpa[i], t = ds.total[i];
   const school = ds.schools[ds.sid[i]];
-  const rank = S.rows.indexOf(i) >= 0 ? S.rows.indexOf(i) + 1 : '-';
+  const rank = i + 1;   // the dataset is pre-sorted by rank, so index+1 IS the board rank
+  const filtered = !!(S.q.trim() || S.gpaMin || S.school !== '');
+  const posInFilter = filtered ? S.rows.indexOf(i) + 1 : 0;
   const subs = subjectsOf(i);
   const defs = m.subjects;
   let bars = '';
@@ -348,7 +350,8 @@ function studentCard(i, forPrint) {
       <div class="kpi"><b>${subs ? Math.round(subs.reduce((a, b) => a + b, 0) / totalFull * 100) + '%' : '—'}</b><span>${subs ? 'Of ' + totalFull : 'Marks %'}</span></div>
     </div>
     ${bars}
-    <p class="note">Rank among ${nf(m.count)} ${esc(m.exam)} ${m.year} ${esc(m.group)} students, ordered by total marks.
+    <p class="note">Board rank <b>${nf(rank)}</b> of ${nf(m.count)} ${esc(m.exam)} ${m.year} ${esc(m.group)}
+      students, ordered by total marks.${posInFilter ? ` Shown as <b>#${nf(posInFilter)}</b> in your current filtered list.` : ''}
       Unofficial — verify with your official marksheet.</p>
     ${actions}
   </div>`;
@@ -456,7 +459,7 @@ function exportStudents() {
   if (ds.subj) defs.forEach(d => head.push(d.name.toLowerCase().replace(/[^a-z0-9]+/g, '_')));
   const lines = [head.join(',')];
   S.rows.forEach((i, k) => {
-    const row = [k + 1, ds.roll[i], csvCell(ds.name[i]), csvCell(ds.schools[ds.sid[i]]),
+    const row = [i + 1, ds.roll[i], csvCell(ds.name[i]), csvCell(ds.schools[ds.sid[i]]),
       ds.gpa[i] < 0 ? '' : gpaTxt(ds.gpa[i]), ds.total[i] < 0 ? '' : ds.total[i]];
     if (ds.subj) {
       const s = subjectsOf(i);
