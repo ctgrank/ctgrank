@@ -9,39 +9,31 @@ import time
 
 CLI = "/home/user/surge-cli/node_modules/.bin/surge"
 PROJECT = "/home/user/shikhor"
-DOMAIN = os.environ.get("DOMAIN", "shikhor-ctg.surge.sh")
+DOMAIN = os.environ.get("DOMAIN", "shikhor.surge.sh")
 EMAIL = os.environ.get("EMAIL", "")
 PASSWORD = os.environ.get("PASSWORD", "")
 
 buf = []
+sent = {"email": 0, "password": 0, "confirm": 0}
 
 
-def pump(fd, master, send_queue, deadline):
-    while time.time() < deadline:
-        r, _, _ = select.select([master], [], [], 1.0)
-        if not r:
-            if send_queue:
-                nxt = send_queue.pop(0)
-                os.write(master, nxt.encode())
-            continue
-        try:
-            chunk = os.read(master, 4096)
-        except OSError:
-            break
-        if not chunk:
-            break
-        text = chunk.decode("utf-8", "replace")
-        buf.append(text)
-        sys.stdout.write(text)
-        sys.stdout.flush()
-        low = text.lower()
-        if "email" in low and ":" in text:
-            send_queue.append(EMAIL + "\n")
-        elif "password" in low and ":" in text:
-            send_queue.append(PASSWORD + "\n")
-        elif re.search(r"\b(project|domain)\b.*:.*$", text, re.I | re.M):
-            send_queue.append("\n")
-    return
+def respond(master, queue, text):
+    low = text.lower()
+    if re.search(r"email\s*:", low):
+        if sent["email"] < 3:
+            sent["email"] += 1
+            queue.append(EMAIL + "\n")
+            return
+    if re.search(r"password\s*:", low) or "password" in low and ":" in text:
+        if sent["password"] < 4:
+            sent["password"] += 1
+            queue.append(PASSWORD + "\n")
+            return
+    if re.search(r"\(y/n\)|\(yes/no\)|confirm", low) and "password" not in low:
+        queue.append("y\n")
+        return
+    if "project:" in low or "domain:" in low:
+        queue.append("\n")
 
 
 def main():
@@ -50,17 +42,41 @@ def main():
     if pid == 0:
         os.environ["TERM"] = "dumb"
         os.execvp(argv[0], argv)
+
     queue = []
-    pump(None, master, queue, time.time() + 300)
+    deadline = time.time() + 300
+    log = []
+    while time.time() < deadline:
+        r, _, _ = select.select([master], [], [], 1.0)
+        if not r:
+            if queue:
+                os.write(master, queue.pop(0).encode())
+            continue
+        try:
+            chunk = os.read(master, 4096)
+        except OSError:
+            break
+        if not chunk:
+            break
+        text = chunk.decode("utf-8", "replace")
+        log.append(text)
+        sys.stdout.write(text)
+        sys.stdout.flush()
+        respond(master, queue, text)
+
     os.close(master)
-    _, status = os.waitpid(pid, 0)
-    print("\n─── exit", status, "───")
-    out = "".join(buf)
-    m = re.findall(r"https?://[a-z0-9.-]+\.surge\.sh", out)
-    if m:
-        print("PUBLISHED:", m[-1])
-    else:
-        print("no surge URL found")
+    try:
+        os.waitpid(pid, 0)
+    except ChildProcessError:
+        pass
+
+    out = "".join(log)
+    open("/tmp/surge_last.log", "w").write(out)
+    print("\n─── done ───")
+    for pat in ("Success! - Published to", "Aborted", "not available", "verify", "error"):
+        for line in out.splitlines():
+            if pat.lower() in line.lower():
+                print("   •", line.strip()[:160])
 
 
 if __name__ == "__main__":

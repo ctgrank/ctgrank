@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ─────────────────────────────────────────────────────────────────────────
 # Redeploy Shikhor to Surge.
-#   ./deploy.sh                       → https://shikhor-ctg.surge.sh
+#   ./deploy.sh                       → https://shikhor.surge.sh
 #   ./deploy.sh my-other.surge.sh     → a different subdomain
 #   ./deploy.sh mydomain.com          → a custom domain you own
 # Non-interactive once ~/.netrc holds the surge credentials (already true
@@ -10,7 +10,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-DOMAIN="${1:-shikhor-ctg.surge.sh}"
+DOMAIN="${1:-shikhor.surge.sh}"
 CLI_DIR="/home/user/surge-cli"
 CLI="$CLI_DIR/node_modules/.bin/surge"
 

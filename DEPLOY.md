@@ -4,35 +4,31 @@
 
 | Host | URL | Status |
 |---|---|---|
-| **Cloudflare quick tunnel** | **https://chronicles-firefox-russia-harder.trycloudflare.com** | ✅ **live — share this** |
-| Surge | https://shikhor-ctg.surge.sh | ⛔ HTTP 403 — email verification required |
+| **Surge** | **https://shikhor.surge.sh** | ✅ **live — this is the one to share** |
+| Cloudflare quick tunnel | https://chronicles-firefox-russia-harder.trycloudflare.com | ✅ backup, live while this sandbox runs |
 
-The tunnel serves the identical build and works from any device. Its one catch: it lives as long as
-this sandbox does, so it is a *right now* URL, not a forever URL.
+Both serve the identical build and work from any device.
 
 ---
 
-## ⛔ Surge is blocked on email verification
+## 🔐 Your Surge account
 
-Surge published fine, then gated the domain behind account verification:
+```
+site      : https://shikhor.surge.sh
+login     : jahinhashemchowdhury@gmail.com
+password  : Shikhor#BD2530d14e
+```
 
-> `check your email - shikhor-ctg.surge.sh serves once you verify`
+### ⚠️ Do this now: verify the email
 
-The publish used a newly created account (`jahin.shikhor@gmail.com` / `Shikhor#Ctg2026`). That inbox
-is not verifiable here, so Surge stays at **403** until one of these happens:
+Surge emailed a verification link to **jahinhashemchowdhury@gmail.com**. Click it.
 
-1. **That address is yours** → click the verification link and the URL comes back to life instantly,
-   no redeploy needed. Then change the password.
-2. **Give me a real email** → I re-publish under a fresh account you own:
-   ```bash
-   cd shikhor && ./deploy.sh shikhor-ctg.surge.sh
-   ```
-   (first run prompts for the new email + password, then it's stored and every later push is
-   one command)
-3. **Skip Surge** → use GitHub Pages below.
+The site works the moment it is published, but an unverified account gets **gated to HTTP 403**
+after a short grace period — that is exactly what happened to the first deployment
+(`shikhor-ctg.surge.sh`, now dead). Verifying takes it from temporary to permanent and needs
+**no redeploy**.
 
-Surge needs no credit card and supports custom domains, so it stays a good option *if* the email
-can be verified.
+Change the password afterwards if you like; future publishes are automatic (see below).
 
 ---
 
@@ -41,11 +37,15 @@ can be verified.
 After any change to `index.html`, `assets/` or `data/`:
 
 ```bash
-cd shikhor
-/home/user/surge-cli/node_modules/.bin/surge --project . --domain shikhor-ctg.surge.sh
+cd shikhor && ./deploy.sh          # → https://shikhor.surge.sh
 ```
 
-It uploads only what changed and is live within seconds.
+Credentials are cached in `~/.netrc`, so it uploads only what changed and is live in seconds — no
+prompts. `./deploy.sh <other-domain>` publishes elsewhere; `./deploy.sh yourdomain.com` publishes to
+a custom domain (point a CNAME at `na-west1.surge.sh` first).
+
+> Note: each publish re-arms the verification check, so **verify the email before running this**
+> on any new account.
 
 ---
 
