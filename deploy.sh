@@ -20,6 +20,13 @@ if [ ! -x "$CLI" ]; then
   ( cd "$CLI_DIR" && npm init -y >/dev/null 2>&1 && npm install surge ) >/dev/null
 fi
 
+# Bump the asset cache-buster so no browser ever serves a stale app.js/styles.css.
+# Without this, a returning visitor can keep running the old bundle (and so keep
+# seeing the old default exam) even though the deploy succeeded.
+V=$(date +%s)
+sed -i -E "s|(assets/styles\.css)\?v=[0-9]+|\1?v=$V|; s|(assets/app\.js)\?v=[0-9]+|\1?v=$V|" index.html
+echo "→ cache-buster v=$V"
+
 echo "→ publishing to https://$DOMAIN"
 "$CLI" --project . --domain "$DOMAIN"
 
