@@ -82,11 +82,6 @@ async function loadCatalog() {
   $('#statYears').textContent = d.length;
   $('#year').textContent = new Date().getFullYear();
 
-  // visit counter (local — this build has no backend)
-  const v = +localStorage.getItem('shikhor_visits') + 1 || 1;
-  localStorage.setItem('shikhor_visits', v);
-  $('#statVisits').textContent = nf(v);
-
   // open on the newest HSC year that has Science — HSC 2026
   const first = d.filter(x => x.exam === 'HSC' && x.group === 'Science')[0]
              || d.filter(x => x.exam === 'SSC')[0];
