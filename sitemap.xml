@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://ctgrank.surge.sh/</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://ctgrank.surge.sh/?exam=HSC&amp;year=2026&amp;group=Science</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://ctgrank.surge.sh/?exam=HSC&amp;year=2026&amp;group=Commerce</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://ctgrank.surge.sh/?exam=HSC&amp;year=2026&amp;group=Arts</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://ctgrank.surge.sh/?exam=HSC&amp;year=2025&amp;group=Science</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://ctgrank.surge.sh/?exam=HSC&amp;year=2025&amp;group=Commerce</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://ctgrank.surge.sh/?exam=HSC&amp;year=2025&amp;group=Arts</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://ctgrank.surge.sh/?exam=HSC&amp;year=2024&amp;group=Science</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://ctgrank.surge.sh/?exam=HSC&amp;year=2024&amp;group=Commerce</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://ctgrank.surge.sh/?exam=HSC&amp;year=2024&amp;group=Arts</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://ctgrank.surge.sh/?exam=HSC&amp;year=2023&amp;group=Science</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://ctgrank.surge.sh/?exam=SSC&amp;year=2026&amp;group=Science</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://ctgrank.surge.sh/?exam=SSC&amp;year=2025&amp;group=Science</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://ctgrank.surge.sh/?exam=SSC&amp;year=2025&amp;group=Arts</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://ctgrank.surge.sh/?exam=SSC&amp;year=2024&amp;group=Science</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://ctgrank.surge.sh/?exam=SSC&amp;year=2024&amp;group=Commerce</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://ctgrank.surge.sh/?exam=SSC&amp;year=2024&amp;group=Arts</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://ctgrank.surge.sh/?exam=SSC&amp;year=2023&amp;group=Science</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://ctgrank.surge.sh/?exam=SSC&amp;year=2023&amp;group=Commerce</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://ctgrank.surge.sh/?exam=SSC&amp;year=2023&amp;group=Arts</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://ctgrank.surge.sh/hsc-2026-science/</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ctgrank.surge.sh/hsc-2026-commerce/</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ctgrank.surge.sh/hsc-2026-arts/</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ctgrank.surge.sh/hsc-2025-science/</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ctgrank.surge.sh/hsc-2025-commerce/</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ctgrank.surge.sh/hsc-2025-arts/</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ctgrank.surge.sh/hsc-2024-science/</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ctgrank.surge.sh/hsc-2024-commerce/</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ctgrank.surge.sh/hsc-2024-arts/</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ctgrank.surge.sh/hsc-2023-science/</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ctgrank.surge.sh/ssc-2026-science/</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ctgrank.surge.sh/ssc-2025-science/</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ctgrank.surge.sh/ssc-2025-arts/</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ctgrank.surge.sh/ssc-2024-science/</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ctgrank.surge.sh/ssc-2024-commerce/</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ctgrank.surge.sh/ssc-2024-arts/</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ctgrank.surge.sh/ssc-2023-science/</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ctgrank.surge.sh/ssc-2023-commerce/</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://ctgrank.surge.sh/ssc-2023-arts/</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
 </urlset>

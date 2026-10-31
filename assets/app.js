@@ -176,7 +176,10 @@ function applySeo(meta) {
     + `${n} students from ${meta.schools} `
     + `${exam === 'HSC' ? 'colleges' : 'schools'}, ranked by total marks with `
     + `subject-wise marks, GPA and board rank.`;
-  const url = `${SEO_SITE}/?exam=${exam}&year=${yr}&group=${grp}`;
+  // the prerendered page is canonical for this dataset; the ?exam=... URL
+  // is the same content served by the SPA
+  const url = `${SEO_SITE}/${exam.toLowerCase()}-${yr}-${grp.toLowerCase()}/`;
+  const appUrl = `${SEO_SITE}/?exam=${exam}&year=${yr}&group=${grp}`;
 
   document.title = title;
   const setMeta = (sel, attr, val) => {
@@ -187,7 +190,7 @@ function applySeo(meta) {
   setMeta('meta[name="description"]', 'content', desc);
   setMeta('meta[property="og:title"]', 'content', title);
   setMeta('meta[property="og:description"]', 'content', desc);
-  setMeta('meta[property="og:url"]', 'content', url);
+  setMeta('meta[property="og:url"]', 'content', appUrl);
   setMeta('meta[name="twitter:title"]', 'content', title);
   setMeta('meta[name="twitter:description"]', 'content', desc);
   // one canonical across all hosts, so the Surge/GitHub copies don't compete

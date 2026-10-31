@@ -38,9 +38,11 @@ open(os.path.join(ROOT, "robots.txt"), "w").write(
     f"User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n")
 
 # ───────────────────────────────── sitemap.xml ──────────────────────────
+# The prerendered /<slug>/ pages are the canonical, crawler-readable versions;
+# the SPA's ?exam=... URLs serve the same content and are not listed.
 urls = [("", "1.0")]
 for m in dsets:
-    urls.append((f'?exam={m["exam"]}&year={m["year"]}&group={m["group"]}', "0.7"))
+    urls.append((f'{m["exam"].lower()}-{m["year"]}-{m["group"].lower()}/', "0.8"))
 TODAY = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 # '&' in a query string is invalid XML and makes Google reject the whole file
 def esc(u):
