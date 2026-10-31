@@ -2,10 +2,11 @@
 """Regenerate README coverage table, robots.txt and sitemap.xml from data/index.json."""
 import json
 import os
+from datetime import datetime, timezone
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.join(HERE, "..")
-SITE = "https://shikhor.surge.sh"
+SITE = "https://ctgrank.surge.sh"
 START, END = "<!--COVERAGE:START-->", "<!--COVERAGE:END-->"
 
 idx = json.load(open(os.path.join(ROOT, "data/index.json")))
@@ -40,8 +41,14 @@ open(os.path.join(ROOT, "robots.txt"), "w").write(
 urls = [("", "1.0")]
 for m in dsets:
     urls.append((f'?exam={m["exam"]}&year={m["year"]}&group={m["group"]}', "0.7"))
+TODAY = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+# '&' in a query string is invalid XML and makes Google reject the whole file
+def esc(u):
+    return u.replace("&", "&amp;").replace("'", "&apos;").replace('"', "&quot;")
 body = "\n".join(
-    f"  <url><loc>{SITE}/{q}</loc><priority>{p}</priority></url>" for q, p in urls)
+    f"  <url><loc>{esc(SITE + '/' + q)}</loc><lastmod>{TODAY}</lastmod>"
+    f"<changefreq>weekly</changefreq><priority>{p}</priority></url>"
+    for q, p in urls)
 open(os.path.join(ROOT, "sitemap.xml"), "w").write(
     '<?xml version="1.0" encoding="UTF-8"?>\n'
     f'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{body}\n</urlset>\n')

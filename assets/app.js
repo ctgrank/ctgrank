@@ -166,6 +166,45 @@ function describeMeta(m) {
 }
 
 /* ───────────────────────────── data loading ────────────────────────── */
+/* ── SEO: keep head tags in step with the dataset on screen ── */
+const SEO_SITE = 'https://ctgrank.surge.sh';
+function applySeo(meta) {
+  const exam = meta.exam, yr = meta.year, grp = meta.group;
+  const n = meta.count.toLocaleString('en-US');
+  const title = `${exam} ${yr} ${grp} Rank List — Chattogram Board | Shikhor`;
+  const desc = `Unofficial ${exam} ${yr} ${grp} merit list for the Chattogram Board: `
+    + `${n} students from ${meta.schools} `
+    + `${exam === 'HSC' ? 'colleges' : 'schools'}, ranked by total marks with `
+    + `subject-wise marks, GPA and board rank.`;
+  const url = `${SEO_SITE}/?exam=${exam}&year=${yr}&group=${grp}`;
+
+  document.title = title;
+  const setMeta = (sel, attr, val) => {
+    let el = document.querySelector(sel);
+    if (!el) return;
+    el.setAttribute(attr === 'text' ? 'content' : attr, val);
+  };
+  setMeta('meta[name="description"]', 'content', desc);
+  setMeta('meta[property="og:title"]', 'content', title);
+  setMeta('meta[property="og:description"]', 'content', desc);
+  setMeta('meta[property="og:url"]', 'content', url);
+  setMeta('meta[name="twitter:title"]', 'content', title);
+  setMeta('meta[name="twitter:description"]', 'content', desc);
+  // one canonical across all hosts, so the Surge/GitHub copies don't compete
+  const canon = document.querySelector('link[rel="canonical"]');
+  if (canon) canon.setAttribute('href', url);
+  const ld = document.querySelector('script[type="application/ld+json"]');
+  if (ld) {
+    try {
+      const data = JSON.parse(ld.textContent);
+      (data['@graph'] || []).forEach(node => {
+        if (node['@type'] === 'WebPage') { node.name = title; node.url = url; node.description = desc; }
+      });
+      ld.textContent = JSON.stringify(data);
+    } catch (e) { /* leave the static graph alone */ }
+  }
+}
+
 async function loadDataset(push = true) {
   const meta = findMeta(S.exam, S.year, S.group);
   if (!meta) { $('#workspace').hidden = true; return; }
@@ -175,6 +214,7 @@ async function loadDataset(push = true) {
   $('#loading').hidden = false;
   $('#wsTitle').textContent = `${meta.exam} ${meta.year} — ${meta.group}`;
   $('#wsMeta').textContent = 'Loading…';
+  applySeo(meta);
   $('#cmpExam').textContent = `${meta.exam} ${meta.year} ${meta.group}`;
 
   try {
