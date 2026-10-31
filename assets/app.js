@@ -12,7 +12,7 @@ const GROUPS = ['Science', 'Commerce', 'Arts'];
 /* ─────────────────────────────── state ─────────────────────────────── */
 const S = {
   catalog: null,
-  exam: 'SSC',
+  exam: 'HSC',
   year: null,
   group: 'Science',
   ds: null,          // loaded dataset
@@ -87,9 +87,10 @@ async function loadCatalog() {
   localStorage.setItem('shikhor_visits', v);
   $('#statVisits').textContent = nf(v);
 
-  // default to the newest SSC year that has Science
-  const first = d.filter(x => x.exam === 'SSC')[0];
-  S.exam = 'SSC';
+  // open on the newest HSC year that has Science — HSC 2026
+  const first = d.filter(x => x.exam === 'HSC' && x.group === 'Science')[0]
+             || d.filter(x => x.exam === 'SSC')[0];
+  S.exam = 'HSC';
   S.year = first.year;
   S.group = 'Science';
 }
