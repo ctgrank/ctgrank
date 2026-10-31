@@ -2,3 +2,8 @@
 /raw/
 shots/
 CNAME
+
+# ── HSC 2026 scrape cache ──────────────────────────────────────────────
+# Rebuilt by tools/hsc2026_fetch_*.py; only the packed data/ datasets ship.
+/hsc2026/
+__pycache__/

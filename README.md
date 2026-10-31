@@ -6,7 +6,7 @@
 
 *Shikhor* is Bengali for **summit** — the top of the merit list.
 
-A dependency-free static web app: pick an **exam → year → group**, then search ~480,000 ranked
+A dependency-free static web app: pick an **exam → year → group**, then search ~530,000 ranked
 results by name, roll number or institution, open any student for their **subject-wise marks**,
 compare two students, browse the **top institutions**, and export anything to CSV.
 
@@ -60,6 +60,9 @@ Optional: set the real URL in `tools/gen_docs.py` (`SITE = ...`) and re-run it t
 <!--COVERAGE:START-->
 | Exam | Year | Group | Students | Inst. | GPA-5 | Avg GPA | Subjects | Source |
 |---|---|---|---:|---:|---:|---:|:--:|---:|
+| HSC | 2026 | Science | 17,273 | 205 | 2,107 | 3.83 | yes | 99.6% |
+| HSC | 2026 | Commerce | 16,554 | 245 | 637 | 3.28 | yes | 99.9% |
+| HSC | 2026 | Arts | 16,265 | 246 | 185 | 3.04 | yes | 99.8% |
 | HSC | 2025 | Science | 17,188 | 196 | 4,044 | 4.15 | yes | 100.0% |
 | HSC | 2025 | Commerce | 16,677 | 246 | 1,506 | 3.61 | yes | 100.0% |
 | HSC | 2025 | Arts | 14,896 | 241 | 533 | 3.39 | yes | 100.0% |
@@ -77,7 +80,7 @@ Optional: set the real URL in `tools/gen_docs.py` (`SITE = ...`) and re-run it t
 | SSC | 2023 | Commerce | 47,175 | 1,048 | 1,416 | 3.56 | no | 100.0% |
 | SSC | 2023 | Arts | 32,945 | 994 | 162 | 3.09 | no | 100.0% |
 | SSC | 2022 | Science | 29,650 | 992 | 14,521 | 4.69 | no | 100.0% |
-| | | **Total** | **479,711** | | | | | |
+| | | **Total** | **529,803** | | | | | |
 <!--COVERAGE:END-->
 
 `Source` = share of the published rows that were present and usable in the upstream data.
@@ -101,6 +104,27 @@ python3 tools/fetch_data.py     # download + Base64/XOR-decode the public result
 python3 tools/build_data.py     # clean, rank, dedupe, pack → data/*.json
 python3 tools/gen_docs.py       # refresh README table, robots.txt, sitemap.xml
 ```
+
+### HSC 2026 — collected straight from the board portal
+
+HSC 2026 was not in the upstream dump, so it is gathered from the Chattogram board's own
+result portal in three passes:
+
+```bash
+python3 tools/fetch_eiin.py              # 1. every institution EIIN           → eiin/
+python3 tools/hsc2026_fetch_rolls.py     # 2. per college: every roll + GPA    → hsc2026/
+python3 tools/hsc2026_fetch_students.py  # 3. per roll: subject-wise marks     → hsc2026/
+python3 tools/hsc2026_build.py           #    rank + pack → data/hsc_2026_*.json
+```
+
+* **277 colleges** entered candidates; **50,092** passed candidates are ranked —
+  17,273 Science · 16,554 Commerce · 16,265 Arts.
+* Only **passed** candidates are listed: that is what the board publishes per institution,
+  and it is what every other dataset here contains.
+* Full marks are **200** a subject, except **ICT at 100**.
+* Sanity check — the GPA-5 counts add to **2,107 + 637 + 185 = 2,929**, exactly the board's
+  published GPA-5 figure for the year.
+* The intermediate `hsc2026/` cache is regenerable, so it is deliberately not committed.
 
 `tools/build_data.py` is the place to change cleaning rules, the ranking comparator, or the
 subject label/full-marks layout (`ssc_subjects()` / `HSC_SUBJECTS`).

@@ -5,7 +5,7 @@ import os
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.join(HERE, "..")
-SITE = "https://example.github.io/shikhor"          # <-- change to your real URL
+SITE = "https://shikhor.surge.sh"
 START, END = "<!--COVERAGE:START-->", "<!--COVERAGE:END-->"
 
 idx = json.load(open(os.path.join(ROOT, "data/index.json")))
