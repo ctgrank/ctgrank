@@ -754,13 +754,12 @@ async function share() {
 /* ──────────────────────────────── boot ─────────────────────────────── */
 (async function boot() {
   initTheme();
-  // The same files are served from shikhor.surge.sh and from GitHub Pages.
-  // Point <link rel=canonical> at whichever host is actually serving, so the
-  // two copies don't fight each other for search ranking.
-  const canon = document.querySelector('link[rel="canonical"]');
-  if (canon && !location.hostname.endsWith('surge.sh')) {
-    canon.setAttribute('href', location.origin + location.pathname);
-  }
+  // The same files are served from shikhor.surge.sh, ctgrank.surge.sh and
+  // (eventually) ctgrank.github.io. Ranking is deliberately consolidated on
+  // ONE host: ctgrank.surge.sh is canonical everywhere, so the mirrors are
+  // treated as copies rather than competing duplicates. applySeo() rewrites
+  // this link per dataset once the data loads.
+  // Flip SEO_SITE to self-report a different canonical host.
   wire();
   try {
     await loadCatalog();
