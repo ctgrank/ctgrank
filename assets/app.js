@@ -107,21 +107,22 @@ function renderPicker() {
   // years
   const years = [...new Set(d.filter(m => m.exam === S.exam).map(m => m.year))].sort((a, b) => b - a);
   const newest = years[0];
-  const busiest = d.filter(m => m.exam === S.exam).reduce((a, b) => (a && a.count >= b.count ? a : b), null);
   $('#yearCards').innerHTML = years.map(y => {
     const has = GROUPS.some(g => findMeta(S.exam, y, g));
-    const partial = d.filter(m => m.exam === S.exam && m.year === y).every(m => m.partial);
     const count = d.filter(m => m.exam === S.exam && m.year === y).reduce((a, b) => a + b.count, 0);
+    // HSC 2026 was collected straight from the board portal — spotlight it.
+    const spotlight = has && S.exam === 'HSC' && y === 2026;
+    // Only "SOON" (no data yet) and "NEW" (newest) ribbons remain: the old
+    // HOT / PART badges were noise, since every listed year is complete enough.
     let ribbon = '';
-    if (!has) ribbon = '<span class="ribbon ribbon-part">SOON</span>';
+    if (!has) ribbon = '<span class="ribbon ribbon-soon">SOON</span>';
     else if (y === newest) ribbon = '<span class="ribbon ribbon-new">NEW</span>';
-    else if (busiest && busiest.year === y) ribbon = '<span class="ribbon ribbon-hot">HOT</span>';
-    else if (partial) ribbon = '<span class="ribbon ribbon-part">PART</span>';
-    return `<button class="year-card ${y === S.year ? 'is-on' : ''}" data-year="${y}" ${has ? '' : 'disabled'}>
+    return `<button class="year-card ${y === S.year ? 'is-on' : ''}${spotlight ? ' is-spotlight' : ''}" data-year="${y}" ${has ? '' : 'disabled'}>
         ${ribbon}
         <div class="yc-exam">${S.exam}</div>
         <div class="yc-year">${String(y).slice(2)}</div>
         <div class="yc-count">${has ? nf(count) + ' students' : 'no data'}</div>
+        ${spotlight ? '<div class="yc-tag">Just added</div>' : ''}
       </button>`;
   }).join('');
 
