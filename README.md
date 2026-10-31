@@ -50,7 +50,9 @@ Shikhor runs on two hosts at once, from the same static files.
 | Host | Address | Command |
 |---|---|---|
 | Surge | <https://shikhor.surge.sh> | `./deploy.sh` |
+| Surge | <https://ctgrank.surge.sh> | `./deploy.sh ctgrank.surge.sh` |
 | GitHub Pages | <https://ctgrank.github.io> | `git push` |
+| **All at once** | — | **`./deploy-all.sh`** |
 
 **GitHub Pages** needs no build step — `.nojekyll` is included and every asset
 path is relative, so it serves from a domain root or a `/repo` sub-path.

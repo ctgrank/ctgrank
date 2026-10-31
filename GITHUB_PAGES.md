@@ -74,13 +74,16 @@ Then open the URL — it should land on **HSC 2026 → Science**.
 
 ---
 
-## Keeping both hosts in sync
+## Keeping all three hosts in sync
 
 ```bash
-./deploy.sh                       # Surge  -> https://shikhor.surge.sh
-git add -A && git commit -m "…"   # GitHub -> https://ctgrank.github.io
+./deploy-all.sh                   # both Surge domains at once
+git add -A && git commit -m "…"   # GitHub Pages
 git push
 ```
+
+Or one Surge domain at a time with `./deploy.sh <domain>` (default
+`shikhor.surge.sh`).
 
 `deploy.sh` deletes any `CNAME` file Surge drops in the project root — a
 stray `CNAME` would break GitHub Pages, so don't commit one.
