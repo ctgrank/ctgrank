@@ -13,13 +13,26 @@ Only PASSED candidates are listed (that is what the board publishes per
 institution, and what every other dataset on the site contains).
 """
 import base64
+import gzip
 import html
 import json
 import os
 import re
 import struct
-from collections import Counter, OrderedDict
+from collections import Counter
 from datetime import datetime, timezone
+
+
+def read_lines(path):
+    """Read a .jsonl cache that may be plain or gzipped (the caches are kept
+    gzipped to keep the workspace small)."""
+    for cand in (path, path + ".gz"):
+        if os.path.exists(cand):
+            op = gzip.open if cand.endswith(".gz") else open
+            with op(cand, "rt", encoding="utf-8") as fh:
+                for line in fh:
+                    yield line
+            return
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.join(HERE, "..")
@@ -54,14 +67,12 @@ KEY_OF = {"Science": "science", "Commerce": "commerce", "Arts": "arts"}
 
 def load_institutes():
     inst = {}
-    p = os.path.join(SRC, "institutes.jsonl")
-    if os.path.exists(p):
-        for line in open(p, encoding="utf-8"):
-            try:
-                r = json.loads(line)
-            except Exception:
-                continue
-            inst[r["eiin"]] = r
+    for line in read_lines(os.path.join(SRC, "institutes.jsonl")):
+        try:
+            r = json.loads(line)
+        except Exception:
+            continue
+        inst[r["eiin"]] = r
     return inst
 
 
@@ -79,7 +90,7 @@ def school_label(rec):
 def main():
     inst = load_institutes()
     rows = []
-    for line in open(os.path.join(SRC, "students.jsonl"), encoding="utf-8"):
+    for line in read_lines(os.path.join(SRC, "students.jsonl")):
         try:
             rows.append(json.loads(line))
         except Exception:

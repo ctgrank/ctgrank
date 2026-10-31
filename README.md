@@ -79,8 +79,7 @@ Optional: set the real URL in `tools/gen_docs.py` (`SITE = ...`) and re-run it t
 | SSC | 2023 | Science | 31,297 | 991 | 9,990 | 4.41 | yes | 100.0% |
 | SSC | 2023 | Commerce | 47,175 | 1,048 | 1,416 | 3.56 | no | 100.0% |
 | SSC | 2023 | Arts | 32,945 | 994 | 162 | 3.09 | no | 100.0% |
-| SSC | 2022 | Science | 29,650 | 992 | 14,521 | 4.69 | no | 100.0% |
-| | | **Total** | **529,803** | | | | | |
+| | | **Total** | **500,153** | | | | | |
 <!--COVERAGE:END-->
 
 `Source` = share of the published rows that were present and usable in the upstream data.
