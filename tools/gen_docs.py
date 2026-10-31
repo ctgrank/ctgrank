@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.join(HERE, "..")
-SITE = "https://ctgrank.surge.sh"
+SITE = "https://ctgrank.pages.dev"
 START, END = "<!--COVERAGE:START-->", "<!--COVERAGE:END-->"
 
 idx = json.load(open(os.path.join(ROOT, "data/index.json")))

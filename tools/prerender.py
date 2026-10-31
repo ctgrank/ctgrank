@@ -20,7 +20,7 @@ from datetime import datetime, timezone
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.join(HERE, "..")
 DATA = os.path.join(ROOT, "data")
-SITE = "https://ctgrank.surge.sh"
+SITE = "https://ctgrank.pages.dev"
 
 TOP_STUDENTS = 100
 TOP_COLLEGES = 50

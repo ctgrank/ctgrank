@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://ctgrank.surge.sh/sitemap.xml
+Sitemap: https://ctgrank.pages.dev/sitemap.xml

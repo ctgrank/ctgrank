@@ -167,7 +167,7 @@ function describeMeta(m) {
 
 /* ───────────────────────────── data loading ────────────────────────── */
 /* ── SEO: keep head tags in step with the dataset on screen ── */
-const SEO_SITE = 'https://ctgrank.surge.sh';
+const SEO_SITE = 'https://ctgrank.pages.dev';
 function applySeo(meta) {
   const exam = meta.exam, yr = meta.year, grp = meta.group;
   const n = meta.count.toLocaleString('en-US');
@@ -754,12 +754,14 @@ async function share() {
 /* ──────────────────────────────── boot ─────────────────────────────── */
 (async function boot() {
   initTheme();
-  // The same files are served from shikhor.surge.sh, ctgrank.surge.sh and
-  // (eventually) ctgrank.github.io. Ranking is deliberately consolidated on
-  // ONE host: ctgrank.surge.sh is canonical everywhere, so the mirrors are
-  // treated as copies rather than competing duplicates. applySeo() rewrites
-  // this link per dataset once the data loads.
-  // Flip SEO_SITE to self-report a different canonical host.
+  // Ranking is deliberately consolidated on ONE host (SEO_SITE), so mirrors
+  // are treated as copies rather than competing duplicates. applySeo()
+  // rewrites this link per dataset once the data loads.
+  //
+  // Note: Surge hijacks /robots.txt on every *.surge.sh subdomain and serves
+  // "Disallow: /", so Surge copies can never be crawled. The canonical host
+  // must be one that actually serves our robots.txt (Cloudflare Pages here).
+  // Change it with: python3 tools/set_canonical.py https://new.host
   wire();
   try {
     await loadCatalog();
