@@ -324,7 +324,14 @@ function studentCard(i, forPrint) {
       </div>`;
     }).join('');
   }
-  const totalFull = defs.reduce((a, b) => a + b.full, 0);
+  // Every exam here is marked out of 1300 (6 x 200 + ICT 100). Older datasets
+  // used a fixed schema that summed to exactly that; HSC 2026 lists every
+  // *possible* elective (11-19 columns), so summing defs would divide by
+  // 2100-3700. Use the real board scale and the stored total, which already
+  // excludes subjects the student did not take (stored as 255).
+  const PCT_FULL = 1300;
+  const marksPct = (subs && t >= 0)
+    ? Math.min(100, Math.round(t / PCT_FULL * 100)) : null;
   const actions = forPrint ? '' : `<div class="scard-actions">
       <button class="btn btn-ghost" data-act="copy">${icon('copy')} Copy result</button>
       <button class="btn btn-ghost" data-act="link">${icon('link')} Copy link</button>
@@ -344,7 +351,7 @@ function studentCard(i, forPrint) {
       <div class="kpi"><b>${rank}</b><span>Board rank</span></div>
       <div class="kpi"><b>${gpaTxt(g)}</b><span>GPA</span></div>
       <div class="kpi"><b>${t < 0 ? '—' : t}</b><span>Total marks</span></div>
-      <div class="kpi"><b>${subs ? Math.round(subs.reduce((a, b) => a + b, 0) / totalFull * 100) + '%' : '—'}</b><span>${subs ? 'Of ' + totalFull : 'Marks %'}</span></div>
+      <div class="kpi"><b>${marksPct == null ? '—' : marksPct + '%'}</b><span>${marksPct == null ? 'Marks %' : 'Of ' + PCT_FULL}</span></div>
     </div>
     ${bars}
     <p class="note">Board rank <b>${nf(rank)}</b> of ${nf(m.count)} ${esc(m.exam)} ${m.year} ${esc(m.group)}

@@ -144,7 +144,9 @@ def main():
             except (TypeError, ValueError):
                 gpa = None
             out.append({"roll": int(r["roll"]),
-                        "name": html.unescape(r.get("name", "")).strip(),
+                        # the board portal returns lowercase names; every other
+                        # dataset on the site stores them capitalised
+                        "name": html.unescape(r.get("name", "")).strip().upper(),
                         "gpa": gpa, "total": total,
                         "school": r["school"], "marks": marks})
 
