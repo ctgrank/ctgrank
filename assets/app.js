@@ -321,6 +321,8 @@ function hl(text, q) {
 }
 
 /* ─────────────────────────── student modal ─────────────────────────── */
+const NO_MARK = 255;   // stored for a subject the student did not sit
+
 function subjectsOf(i) {
   const ds = S.ds;
   if (!ds.subj) return null;
@@ -341,7 +343,9 @@ function studentCard(i, forPrint) {
   let bars = '';
   if (subs) {
     bars = '<p class="subj-h">Subject-wise marks</p>' + defs.map((d, k) => {
-      const v = subs[k], pct = Math.min(100, Math.round(v / d.full * 100));
+      const v = subs[k];
+      if (v === NO_MARK) return '';   // not sat by this student - do not show
+      const pct = Math.min(100, Math.round(v / d.full * 100));
       const cls = pct >= 80 ? 'g5' : pct < 33 ? 'lo' : '';
       return `<div class="subj">
         <div class="subj-row"><span class="sn">${esc(d.name)}</span>
@@ -496,7 +500,7 @@ function exportStudents() {
       ds.gpa[i] < 0 ? '' : gpaTxt(ds.gpa[i]), ds.total[i] < 0 ? '' : ds.total[i]];
     if (ds.subj) {
       const s = subjectsOf(i);
-      defs.forEach((_, k) => row.push(s ? s[k] : ''));
+      defs.forEach((_, k) => row.push(s && s[k] !== NO_MARK ? s[k] : ''));
     }
     lines.push(row.join(','));
   });
@@ -656,7 +660,9 @@ function wire() {
         `${ds.meta.exam} ${ds.meta.year} — ${ds.meta.group}`,
         `Name: ${ds.name[i]}`, `Roll: ${ds.roll[i]}`, `Institution: ${ds.schools[ds.sid[i]]}`,
         `GPA: ${gpaTxt(ds.gpa[i])}`, `Total marks: ${ds.total[i]}`,
-        ds.meta.hasSubjects && subs ? '\nSubject-wise:\n' + ds.meta.subjects.map((d, k) => `  ${d.name}: ${subs[k]}/${d.full}`).join('\n') : '',
+        ds.meta.hasSubjects && subs ? '\nSubject-wise:\n' + ds.meta.subjects
+          .map((d, k) => subs[k] === NO_MARK ? '' : `  ${d.name}: ${subs[k]}/${d.full}`)
+          .filter(Boolean).join('\n') : '',
         '\nShikhor © ' + new Date().getFullYear() + ' Jahin — unofficial, verify with your official marksheet.',
       ].filter(Boolean).join('\n');
       try { await navigator.clipboard.writeText(txt); toast('Result copied'); }
