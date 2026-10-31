@@ -17,7 +17,7 @@
 <meta property="og:description" content="Unofficial SSC &amp; HSC rankings for the Chattogram Education Board. Search by roll, name or school." />
 <meta name="twitter:site" content="@shikhor" />
 <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
-<link rel="stylesheet" href="assets/styles.css?v=1793435179" />
+<link rel="stylesheet" href="assets/styles.css?v=1793435767" />
 </head>
 <body>
 
@@ -61,7 +61,7 @@
     </button>
     <nav class="nav-links" id="navLinks" aria-label="Main">
       <a href="#picker" class="active"><svg><use href="#i-trophy"/></svg> Rankings</a>
-      <a href="#schoolsView" data-goto="schools"><svg><use href="#i-school"/></svg> Top Schools</a>
+      <a href="#schoolsView" data-goto="schools"><svg><use href="#i-school"/></svg> <span id="navSchoolsLbl">Top Schools</span></a>
       <a href="#compareView" data-goto="compare"><svg><use href="#i-compare"/></svg> Compare</a>
       <a href="#about"><svg><use href="#i-info"/></svg> About</a>
       <button class="linklike" id="themeBtn" aria-label="Toggle dark mode">
@@ -102,8 +102,8 @@
     <div class="picker-head">
       <h2><svg><use href="#i-filter"/></svg> 1. Choose exam, year &amp; group</h2>
       <div class="seg" id="examSeg" role="tablist" aria-label="Exam">
-        <button class="seg-btn" data-exam="SSC" role="tab">SSC / Dakhil</button>
-        <button class="seg-btn is-on" data-exam="HSC" role="tab">HSC / Alim</button>
+        <button class="seg-btn" data-exam="SSC" role="tab">SSC</button>
+        <button class="seg-btn is-on" data-exam="HSC" role="tab">HSC</button>
       </div>
     </div>
 
@@ -123,7 +123,7 @@
       </div>
       <div class="seg seg-sm" id="viewSeg" role="tablist" aria-label="View">
         <button class="seg-btn is-on" data-view="students" role="tab"><svg><use href="#i-users"/></svg> Students</button>
-        <button class="seg-btn" data-view="schools" role="tab"><svg><use href="#i-school"/></svg> Schools</button>
+        <button class="seg-btn" id="viewSchoolsBtn" data-view="schools" role="tab"><svg><use href="#i-school"/></svg> <span>Schools</span></button>
         <button class="seg-btn" data-view="compare" role="tab"><svg><use href="#i-compare"/></svg> Compare</button>
       </div>
     </div>
@@ -149,7 +149,7 @@
       <div class="chips" id="chips"></div>
 
       <div class="table-head" id="tableHead">
-        <span>Rank</span><span>Roll</span><span>Name</span><span>Institution</span><span class="num">GPA</span><span class="num">Total</span><span></span>
+        <span id="hRank">Rank</span><span>Roll</span><span>Name</span><span>Institution</span><span class="num">GPA</span><span class="num">Total</span><span></span>
       </div>
       <div class="table-scroll" id="tableScroll" tabindex="0">
         <div class="table-spacer" id="tableSpacer"></div>
@@ -246,6 +246,6 @@
 
 <div class="toast" id="toast" hidden></div>
 
-<script src="assets/app.js?v=1793435179"></script>
+<script src="assets/app.js?v=1793435767"></script>
 </body>
 </html>

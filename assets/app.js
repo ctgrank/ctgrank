@@ -93,12 +93,30 @@ async function loadCatalog() {
 const findMeta = (exam, year, group) =>
   S.catalog.datasets.find(m => m.exam === exam && m.year === +year && m.group === group);
 
+/* HSC institutions are colleges, SSC institutions are schools. */
+const capWord = (plural) => (S.exam === 'HSC' ? (plural ? 'Colleges' : 'College')
+                                              : (plural ? 'Schools'  : 'School'));
+
+/* Relabel every "school" surface to match the selected exam. */
+function applyExamLabels() {
+  const cap = capWord(true);
+  const btn = $('#viewSchoolsBtn span');
+  if (btn) btn.textContent = cap;
+  const nav = $('#navSchoolsLbl');
+  if (nav) nav.textContent = 'Top ' + cap;
+  const q = $('#q');
+  if (q) q.placeholder = 'Search by name, roll number or ' + capWord(false).toLowerCase() + '…';
+  const sf = $('#schoolFilter');
+  if (sf && sf.options.length) sf.options[0].textContent = 'All ' + cap.toLowerCase();
+}
+
 /* ──────────────────────────────── picker ───────────────────────────── */
 function renderPicker() {
   const d = S.catalog.datasets;
 
   // exam
   $$('#examSeg .seg-btn').forEach(b => b.classList.toggle('is-on', b.dataset.exam === S.exam));
+  applyExamLabels();
 
   // years
   const years = [...new Set(d.filter(m => m.exam === S.exam).map(m => m.year))].sort((a, b) => b - a);
@@ -184,7 +202,8 @@ async function loadDataset(push = true) {
     S.ds = ds;
 
     // school filter dropdown
-    $('#schoolFilter').innerHTML = '<option value="">All institutions</option>' +
+    $('#schoolFilter').innerHTML =
+      '<option value="">All ' + capWord(true).toLowerCase() + '</option>' +
       ds.schools.map((s, i) => `<option value="${i}">${esc(s)}</option>`).join('');
 
     $('#wsMeta').textContent =
@@ -267,13 +286,20 @@ function paintRows() {
     const first = Math.max(0, Math.floor(sc.scrollTop / h) - 6);
     const last = Math.min(list.length, first + Math.ceil(sc.clientHeight / h) + 12);
     const q = S.q.trim().toLowerCase();
+    const hR = $('#hRank');
+    if (hR) hR.textContent = S.school !== '' ? 'Merit' : 'Rank';
     let html = '';
     for (let k = first; k < last; k++) {
       const i = list[k];
       const g = ds.gpa[i], t = ds.total[i];
       const cls = g >= 500 ? 'pill-g5' : g >= 400 ? 'pill-g4' : 'pill-g0';
+      // With an institution selected the list is that college's own merit
+      // order; otherwise rows carry the true board rank. The student card
+      // always shows the board rank.
+      const inInst = S.school !== '';
+      const shown = inInst ? k + 1 : i + 1;
       html += `<div class="row" data-i="${i}" style="top:${k * h}px" role="button" tabindex="0">
-        <span class="rk ${i < 3 ? 'top' : ''}">${nf(i + 1)}</span>
+        <span class="rk ${shown < 4 ? 'top' : ''}">${nf(shown)}</span>
         <span class="rl">${ds.rollS[i]}</span>
         <span class="nm">${hl(ds.name[i], q)}</span>
         <span class="sc">${hl(ds.schools[ds.sid[i]], q)}</span>
@@ -462,8 +488,11 @@ function exportStudents() {
   const defs = ds.meta.subjects;
   if (ds.subj) defs.forEach(d => head.push(d.name.toLowerCase().replace(/[^a-z0-9]+/g, '_')));
   const lines = [head.join(',')];
+  // the button says "the rows below", so export the same numbers the table shows
+  const inInst = S.school !== '';
   S.rows.forEach((i, k) => {
-    const row = [i + 1, ds.roll[i], csvCell(ds.name[i]), csvCell(ds.schools[ds.sid[i]]),
+    const row = [inInst ? k + 1 : i + 1, ds.roll[i], csvCell(ds.name[i]),
+      csvCell(ds.schools[ds.sid[i]]),
       ds.gpa[i] < 0 ? '' : gpaTxt(ds.gpa[i]), ds.total[i] < 0 ? '' : ds.total[i]];
     if (ds.subj) {
       const s = subjectsOf(i);
