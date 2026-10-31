@@ -705,6 +705,13 @@ async function share() {
 /* ──────────────────────────────── boot ─────────────────────────────── */
 (async function boot() {
   initTheme();
+  // The same files are served from shikhor.surge.sh and from GitHub Pages.
+  // Point <link rel=canonical> at whichever host is actually serving, so the
+  // two copies don't fight each other for search ranking.
+  const canon = document.querySelector('link[rel="canonical"]');
+  if (canon && !location.hostname.endsWith('surge.sh')) {
+    canon.setAttribute('href', location.origin + location.pathname);
+  }
   wire();
   try {
     await loadCatalog();

@@ -43,15 +43,30 @@ Any static server works — `python3 -m http.server`, `npx serve`, nginx, …
 **Do not open `index.html` by double-clicking it**: browsers block `fetch()` on `file://` URLs, so
 the datasets will not load.
 
-## 📦 Deploy to GitHub Pages
+## 📦 Deploy
 
-1. Push this folder to a GitHub repository.
-2. *Settings → Pages → Build and deployment → Deploy from a branch → `main` / `/ (root)`*.
-3. Done. `.nojekyll` is already included, and all asset paths are relative so it also works under a
-   sub-path (`https://user.github.io/shikhor/`).
+Shikhor runs on two hosts at once, from the same static files.
 
-Optional: set the real URL in `tools/gen_docs.py` (`SITE = ...`) and re-run it to refresh
-`sitemap.xml` / `robots.txt` for search engines.
+| Host | Address | Command |
+|---|---|---|
+| Surge | <https://shikhor.surge.sh> | `./deploy.sh` |
+| GitHub Pages | <https://ctgrank.github.io> | `git push` |
+
+**GitHub Pages** needs no build step — `.nojekyll` is included and every asset
+path is relative, so it serves from a domain root or a `/repo` sub-path.
+Full step-by-step (account, token, Pages settings, troubleshooting) is in
+**[GITHUB_PAGES.md](GITHUB_PAGES.md)**.
+
+To make GitHub the primary address in `sitemap.xml` / `robots.txt`, change
+`SITE` in `tools/gen_docs.py` and re-run it:
+
+```bash
+sed -i 's|https://shikhor.surge.sh|https://ctgrank.github.io|' tools/gen_docs.py
+python3 tools/gen_docs.py
+```
+
+`deploy.sh` deletes the `CNAME` file Surge drops in the project root — a stray
+`CNAME` would break GitHub Pages, so don't commit one.
 
 ---
 
