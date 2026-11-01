@@ -778,8 +778,11 @@ function paintPcm() {
       const i = list[k];
       const g = ds.gpa[i];
       const cls = g >= 500 ? 'pill-g5' : g >= 400 ? 'pill-g4' : 'pill-g0';
+      // Always the student's true PCM merit, never their position in the
+      // search results — merit belongs to the student, not to the filter.
+      const merit = S.pcmRank.get(i) || (k + 1);
       html += `<div class="row" data-i="${i}" style="top:${k * h}px" role="button" tabindex="0">
-        <span class="rk ${k < 3 ? 'top' : ''}">${nf(k + 1)}</span>
+        <span class="rk ${merit < 4 ? 'top' : ''}">${nf(merit)}</span>
         <span class="rl">${hl(ds.rollS[i], q)}</span>
         <span class="nm">${hl(ds.name[i], q)}</span>
         <span class="sc">${hl(ds.schools[ds.sid[i]], q)}</span>
