@@ -32,6 +32,55 @@ def slug(meta):
     return "%s-%d-%s" % (meta["exam"].lower(), meta["year"], meta["group"].lower())
 
 
+NO_MARK = 255
+
+
+def pcm_columns(meta):
+    """(physics, chemistry, math) column indices, or None if unknowable.
+
+    Only HSC cohorts whose source data names its subject columns qualify;
+    older HSC datasets store marks under a generic "Compulsory"/"Optional"
+    template, so Mathematics cannot be identified there.
+    """
+    if meta.get("exam") != "HSC":
+        return None
+    names = [(s.get("name") or "").lower() for s in (meta.get("subjects") or [])]
+
+    def find(*keys):
+        for k in keys:
+            for i, nm in enumerate(names):
+                if k in nm:
+                    return i
+        return -1
+
+    a, b, c = find("physics"), find("chemistry"), \
+        find("higher mathematics", "mathematics", "math")
+    return None if min(a, b, c) < 0 else (a, b, c)
+
+
+def merit_order(d, meta, blob, w):
+    """Row indices in merit order: GPA, then total marks, then PCM, then roll.
+
+    Must stay identical to resortDataset() in assets/app.js, or the static
+    pages and the app would disagree on every rank.
+    """
+    cols = pcm_columns(meta) if (blob and w) else None
+    pcm = None
+    if cols:
+        pcm = []
+        for i in range(len(d["roll"])):
+            off = i * w
+            vals = [blob[off + c] for c in cols]
+            pcm.append(-1 if NO_MARK in vals else sum(vals))
+    idx = list(range(len(d["roll"])))
+    idx.sort(key=lambda i: (
+        -d["gpa"][i],
+        -d["total"][i],
+        -(pcm[i] if pcm and pcm[i] >= 0 else -1),
+        d["roll"][i],
+    ))
+    return idx
+
 def label(meta):
     return "%s %d %s" % (meta["exam"], meta["year"], meta["group"])
 
@@ -44,7 +93,8 @@ def page(meta, index_meta, all_metas):
     url = "%s/%s/" % (SITE, slug_)
     title = "%s Rank List — Chattogram Board | Shikhor" % label(meta)
     desc = ("%s merit list for the Chattogram Education Board: %s students from "
-            "%d %s, ranked by total marks. Board rank, GPA and subject-wise "
+            "%d %s, ranked by GPA then total marks. Board rank, GPA and "
+            "subject-wise "
             "marks for the top %d."
             % (label(meta), f"{n:,}", meta["schools"], inst, TOP_STUDENTS))
 
@@ -52,8 +102,10 @@ def page(meta, index_meta, all_metas):
     blob = base64.b64decode(d["subjects"]) if d.get("subjects") else b""
 
     # ── top students ──
+    order = merit_order(d, meta, blob, w)
+    rank_of = {orig: pos + 1 for pos, orig in enumerate(order)}
     rows = []
-    for i in range(min(TOP_STUDENTS, len(d["roll"]))):
+    for i in order[:TOP_STUDENTS]:
         gpa = d["gpa"][i] / 100 if d["gpa"][i] >= 0 else None
         rows.append(
             '<tr><td class="rk">%s</td><td class="roll">%s</td><td>%s</td>'
@@ -74,7 +126,7 @@ def page(meta, index_meta, all_metas):
         if g >= 0:
             a["gs"] += g / 100
         if a["best"] is None:
-            a["best"] = i + 1
+            a["best"] = rank_of[i]
     cols = sorted(agg.items(), key=lambda kv: (-kv[1]["g5"], kv[1]["best"]))[:TOP_COLLEGES]
     crows = []
     for pos, (sid, a) in enumerate(cols, 1):
@@ -92,7 +144,7 @@ def page(meta, index_meta, all_metas):
                        % (d["roll"][i], d["schools"][d["sid"][i]], d["total"][i],
                           "%.2f" % (d["gpa"][i] / 100) if d["gpa"][i] >= 0 else "n/a",
                           i + 1, f"{n:,}", label(meta)),
-    } for i in range(min(TOP_STUDENTS, len(d["roll"])))]
+    } for i in order[:TOP_STUDENTS]]
     ld = {
         "@context": "https://schema.org",
         "@graph": [
@@ -176,8 +228,9 @@ def page(meta, index_meta, all_metas):
 
 <h1>{esc(label(meta))} Rank List — Chattogram Board</h1>
 <p>The unofficial {esc(label(meta))} merit list for the <b>Chattogram (Chittagong)
-Education Board</b>. All {n:,} candidates are ordered by <b>total marks</b>; ties are broken by
-GPA and then by roll number, so students on identical marks share a rank.</p>
+Education Board</b>. All {n:,} candidates are ordered by <b>GPA</b>, then by <b>total marks</b>, then by
+combined Physics + Chemistry + Mathematics where those are recorded; roll number
+breaks any remaining tie.</p>
 
 <div class="facts">
   <div class="fact"><b>{n:,}</b>students ranked</div>

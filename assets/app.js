@@ -174,7 +174,7 @@ function applySeo(meta) {
   const title = `${exam} ${yr} ${grp} Rank List — Chattogram Board | Shikhor`;
   const desc = `Unofficial ${exam} ${yr} ${grp} merit list for the Chattogram Board: `
     + `${n} students from ${meta.schools} `
-    + `${exam === 'HSC' ? 'colleges' : 'schools'}, ranked by total marks with `
+    + `${exam === 'HSC' ? 'colleges' : 'schools'}, ranked by GPA then total marks with `
     + `subject-wise marks, GPA and board rank.`;
   // the prerendered page is canonical for this dataset; the ?exam=... URL
   // is the same content served by the SPA
@@ -208,6 +208,92 @@ function applySeo(meta) {
   }
 }
 
+/* ─────────────────────────────── PCM ────────────────────────────────
+   PCM = Physics + Chemistry + Mathematics, for HSC Science cohorts whose
+   source data names its subject columns. Older datasets store marks under
+   a generic template ("Compulsory"/"Optional"), so Math cannot be
+   identified there and PCM is simply unavailable. */
+function pcmColumns(meta) {
+  // PCM was asked for HSC. SSC's "Physics"/"Chemistry" columns come from a
+  // different (100-mark) subject layout and aren't comparable.
+  if (meta.exam !== 'HSC') return null;
+  const names = (meta.subjects || []).map(s => (s.name || '').toLowerCase());
+  const find = (...keys) => {
+    for (const k of keys) {
+      const i = names.findIndex(n => n.includes(k));
+      if (i >= 0) return i;
+    }
+    return -1;
+  };
+  const p = find('physics');
+  const c = find('chemistry');
+  // "Higher Mathematics" / "Mathematics" — never the generic "Compulsory".
+  const m = find('higher mathematics', 'mathematics', 'math');
+  if (p < 0 || c < 0 || m < 0) return null;
+  return { p, c, m };
+}
+
+function computePcm(ds) {
+  const cols = pcmColumns(ds.meta);
+  ds.pcmCols = cols;
+  if (!cols || !ds.subj || !ds.width) { ds.pcm = null; return; }
+  const out = new Array(ds.n);
+  let have = 0;
+  for (let i = 0; i < ds.n; i++) {
+    const off = i * ds.width;
+    const a = ds.subj[off + cols.p], b = ds.subj[off + cols.c], c = ds.subj[off + cols.m];
+    if (a === NO_MARK || b === NO_MARK || c === NO_MARK) { out[i] = -1; continue; }
+    out[i] = a + b + c;
+    have++;
+  }
+  ds.pcm = out;
+  ds.pcmHave = have;
+}
+
+/* Merit order. GPA leads, then total marks, then PCM where it is known,
+   then roll number. The dataset ships pre-sorted on the old rule, so the
+   parallel arrays are physically reordered here and index+1 stays the
+   rank everywhere else in the app. */
+function resortDataset(ds) {
+  const pcm = ds.pcm;
+  const perm = new Array(ds.n);
+  for (let i = 0; i < ds.n; i++) perm[i] = i;
+  const key = (a, b) =>
+    (ds.gpa[b] - ds.gpa[a]) ||
+    (ds.total[b] - ds.total[a]) ||
+    (pcm ? ((pcm[b] < 0 ? -1 : pcm[b]) - (pcm[a] < 0 ? -1 : pcm[a])) : 0) ||
+    (ds.roll[a] - ds.roll[b]);
+  perm.sort(key);
+
+  const pick = arr => { const o = new Array(perm.length); for (let i = 0; i < perm.length; i++) o[i] = arr[perm[i]]; return o; };
+  ds.roll  = pick(ds.roll);
+  ds.name  = pick(ds.name);
+  ds.gpa   = pick(ds.gpa);
+  ds.total = pick(ds.total);
+  ds.sid   = pick(ds.sid);
+  if (pcm) ds.pcm = pick(pcm);
+  if (ds.subj && ds.width) {
+    const nb = new Uint8Array(ds.n * ds.width);
+    for (let i = 0; i < ds.n; i++) {
+      nb.set(ds.subj.subarray(perm[i] * ds.width, perm[i] * ds.width + ds.width), i * ds.width);
+    }
+    ds.subj = nb;
+  }
+}
+
+/* PCM merit list: GPA, then PCM, then total. Only students with all three. */
+function buildPcmOrder(ds) {
+  if (!ds.pcm) return [];
+  const idx = [];
+  for (let i = 0; i < ds.n; i++) if (ds.pcm[i] >= 0) idx.push(i);
+  idx.sort((a, b) =>
+    (ds.gpa[b] - ds.gpa[a]) ||
+    (ds.pcm[b] - ds.pcm[a]) ||
+    (ds.total[b] - ds.total[a]) ||
+    (ds.roll[a] - ds.roll[b]));
+  return idx;
+}
+
 async function loadDataset(push = true) {
   const meta = findMeta(S.exam, S.year, S.group);
   if (!meta) { $('#workspace').hidden = true; return; }
@@ -237,6 +323,8 @@ async function loadDataset(push = true) {
       width: j.subjWidth,
     };
     ds.n = ds.roll.length;
+    computePcm(ds);
+    resortDataset(ds);
     ds.nameL = ds.name.map(s => s.toLowerCase());
     ds.schoolL = ds.schools.map(s => s.toLowerCase());
     ds.rollS = ds.roll.map(String);
@@ -250,9 +338,14 @@ async function loadDataset(push = true) {
       ds.schools.map((s, i) => `<option value="${i}">${esc(s)}</option>`).join('');
 
     $('#wsMeta').textContent =
-      `${nf(meta.count)} students • ${nf(meta.schools)} institutions • ranked by total marks` +
+      `${nf(meta.count)} students • ${nf(meta.schools)} institutions • ranked by GPA, then total marks` +
+      (S.ds && S.ds.pcm ? ' • PCM merit available' : '') +
       (meta.hasSubjects ? ' • subject-wise marks available' : '');
 
+    // the PCM tab depends on this dataset having named PCM columns
+    setView(S.view === 'pcm' && S.ds.pcm ? 'pcm'
+          : S.view === 'compare' ? 'compare'
+          : S.view === 'schools' ? 'schools' : 'students');
     applyFilters();
     renderSchools();
     if (push) writeUrl(true);
@@ -428,10 +521,41 @@ function studentCard(i, forPrint) {
     </div>
     ${bars}
     <p class="note">Board rank <b>${nf(rank)}</b> of ${nf(m.count)} ${esc(m.exam)} ${m.year} ${esc(m.group)}
-      students, ordered by total marks.${posInFilter ? ` Shown as <b>#${nf(posInFilter)}</b> in your current filtered list.` : ''}
+      students, ordered by GPA then total marks.${posInFilter ? ` Shown as <b>#${nf(posInFilter)}</b> in your current filtered list.` : ''}
       Unofficial — verify with your official marksheet.</p>
+    ${pcmCardLine(ds, i)}
     ${actions}
   </div>`;
+}
+
+/* PCM merit position for one student (cached alongside the PCM view). */
+function pcmMeritOf(ds, i) {
+  if (!ds || !ds.pcm || ds.pcm[i] < 0) return null;
+  if (!S.pcmOrder || S.pcmOrderDs !== ds) {
+    S.pcmOrder = buildPcmOrder(ds);
+    S.pcmOrderDs = ds;
+    S.pcmRank = new Map();
+    S.pcmOrder.forEach((idx, r) => S.pcmRank.set(idx, r + 1));
+  }
+  const rank = S.pcmRank.get(i);
+  return rank ? { rank, of: S.pcmOrder.length, marks: ds.pcm[i] } : null;
+}
+
+/* Shown at the end of a student card: PCM merit + combined marks. */
+function pcmCardLine(ds, i) {
+  const m = pcmMeritOf(ds, i);
+  if (!m) return '';
+  const cols = ds.pcmCols;
+  const names = (ds.meta.subjects || []).map(x => x.name);
+  const trio = [cols.p, cols.c, cols.m].map(c => names[c]).join(' + ');
+  return `<div class="pcm-merit">
+      <div class="pcm-merit-h">PCM merit</div>
+      <div class="pcm-merit-b">
+        <b>#${nf(m.rank)}</b> of ${nf(m.of)}
+        <span>${trio} = <b>${m.marks}</b></span>
+      </div>
+      <div class="pcm-merit-n">Among students who sat all three, ordered by GPA then PCM marks.</div>
+    </div>`;
 }
 
 function openStudent(i, push = true) {
@@ -585,13 +709,69 @@ function readUrl() {
 /* ──────────────────────────────── views ────────────────────────────── */
 function setView(v) {
   S.view = v;
+  // PCM needs named Physics/Chemistry/Math columns; hide the tab where the
+  // source data can't supply them.
+  const hasPcm = !!(S.ds && S.ds.pcm);
+  if (v === 'pcm' && !hasPcm) v = 'students';
+  const pcmBtn = $('#viewPcmBtn');
+  if (pcmBtn) pcmBtn.hidden = !hasPcm;
+  S.view = v;
   $('#viewStudents').hidden = v !== 'students';
   $('#viewSchools').hidden = v !== 'schools';
   $('#viewCompare').hidden = v !== 'compare';
+  $('#viewPcm').hidden = v !== 'pcm';
   $$('#viewSeg .seg-btn').forEach(b => b.classList.toggle('is-on', b.dataset.view === v));
   if (v === 'students') { renderTable(); }
   if (v === 'schools') renderSchools();
   if (v === 'compare') renderCompare();
+  if (v === 'pcm') renderPcm();
+}
+
+/* PCM merit list — GPA first, then combined PCM marks. */
+function renderPcm() {
+  const ds = S.ds;
+  if (!ds || !ds.pcm) return;
+  if (!S.pcmOrder || S.pcmOrderDs !== ds) {
+    S.pcmOrder = buildPcmOrder(ds);
+    S.pcmOrderDs = ds;
+    S.pcmRank = new Map();
+    S.pcmOrder.forEach((i, r) => S.pcmRank.set(i, r + 1));
+  }
+  const list = S.pcmOrder;
+  $('#pcmFoot').textContent =
+    `${nf(list.length)} of ${nf(ds.n)} students sat Physics, Chemistry and Mathematics`;
+  const h = rowH();
+  $('#pcmSpacer').style.height = (list.length * h) + 'px';
+  paintPcm();
+}
+
+let pcmRaf = 0;
+function paintPcm() {
+  cancelAnimationFrame(pcmRaf);
+  pcmRaf = requestAnimationFrame(() => {
+    const ds = S.ds;
+    if (!ds || !S.pcmOrder) return;
+    const list = S.pcmOrder, sc = $('#pcmScroll'), box = $('#pcmRows');
+    const h = rowH();
+    const first = Math.max(0, Math.floor(sc.scrollTop / h) - 6);
+    const last = Math.min(list.length, first + Math.ceil(sc.clientHeight / h) + 12);
+    let html = '';
+    for (let k = first; k < last; k++) {
+      const i = list[k];
+      const g = ds.gpa[i];
+      const cls = g >= 500 ? 'pill-g5' : g >= 400 ? 'pill-g4' : 'pill-g0';
+      html += `<div class="row" data-i="${i}" style="top:${k * h}px" role="button" tabindex="0">
+        <span class="rk ${k < 3 ? 'top' : ''}">${nf(k + 1)}</span>
+        <span class="rl">${ds.rollS[i]}</span>
+        <span class="nm">${esc(ds.name[i])}</span>
+        <span class="sc">${esc(ds.schools[ds.sid[i]])}</span>
+        <span class="num c-gpa"><span class="pill ${cls}">${gpaTxt(g)}</span></span>
+        <span class="num c-tot"><b>${ds.pcm[i]}</b></span>
+        <span class="go">›</span>
+      </div>`;
+    }
+    box.innerHTML = html;
+  });
 }
 
 /* ─────────────────────────────── wiring ────────────────────────────── */
@@ -661,6 +841,11 @@ function wire() {
 
   // table
   $('#tableScroll').addEventListener('scroll', paintRows, { passive: true });
+  $('#pcmScroll').addEventListener('scroll', paintPcm, { passive: true });
+  $('#pcmRows').addEventListener('click', e => {
+    const r = e.target.closest('.row');
+    if (r) openStudent(+r.dataset.i);
+  });
   addEventListener('resize', debounce(() => { renderTable(); }, 120));
   $('#rows').addEventListener('click', e => {
     const r = e.target.closest('.row'); if (r) openStudent(+r.dataset.i);

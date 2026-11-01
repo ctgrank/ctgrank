@@ -460,3 +460,19 @@ mark { background: color-mix(in srgb, var(--accent) 40%, transparent); color: in
 #browse .dirlist a:hover { text-decoration: underline; }
 #browse .dirlist span { display: block; font-size: 12px; color: var(--muted); font-weight: 500; }
 #browse h3 { margin: 14px 0 8px; }
+
+/* ── PCM merit block on the student card ── */
+.pcm-merit {
+  margin: 14px 0 4px; padding: 12px 14px;
+  border: 1px solid var(--line); border-radius: 10px;
+  background: color-mix(in srgb, var(--primary) 6%, transparent);
+}
+.pcm-merit-h {
+  font-size: 11px; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--primary); margin-bottom: 6px;
+}
+.pcm-merit-b { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.pcm-merit-b > b { font-size: 1.35rem; color: var(--primary); }
+.pcm-merit-b span { font-size: .9rem; color: var(--muted); }
+.pcm-merit-b span b { color: var(--text); }
+.pcm-merit-n { margin-top: 6px; font-size: 12px; color: var(--muted); }

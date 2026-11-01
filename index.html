@@ -145,6 +145,7 @@
         <button class="seg-btn is-on" data-view="students" role="tab"><svg><use href="#i-users"/></svg> Students</button>
         <button class="seg-btn" id="viewSchoolsBtn" data-view="schools" role="tab"><svg><use href="#i-school"/></svg> <span>Schools</span></button>
         <button class="seg-btn" data-view="compare" role="tab"><svg><use href="#i-compare"/></svg> Compare</button>
+        <button class="seg-btn" id="viewPcmBtn" data-view="pcm" role="tab" hidden><svg><use href="#i-trophy"/></svg> PCM</button>
       </div>
     </div>
 
@@ -205,6 +206,19 @@
     </div>
 
     <!-- ----------------------------- compare ---------------------------- -->
+    <div class="view" id="viewPcm" hidden>
+      <p class="hint">Ranked by <b>GPA</b>, then by combined <b>Physics + Chemistry + Mathematics</b> marks.
+         Only students who sat all three subjects appear here.</p>
+      <div class="table-head" id="pcmHead">
+        <span>Merit</span><span>Roll</span><span>Name</span><span>Institution</span><span class="num">GPA</span><span class="num">PCM</span><span></span>
+      </div>
+      <div class="table-scroll" id="pcmScroll">
+        <div id="pcmRows"></div>
+        <div id="pcmSpacer"></div>
+      </div>
+      <p class="table-foot" id="pcmFoot"></p>
+    </div>
+
     <div class="view" id="viewCompare" hidden>
       <p class="hint">Look up two students of the <b id="cmpExam">—</b> exam and see them side by side.</p>
       <div class="cmp-inputs">
