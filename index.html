@@ -209,6 +209,13 @@
     <div class="view" id="viewPcm" hidden>
       <p class="hint">Ranked by <b>GPA</b>, then by combined <b>Physics + Chemistry + Mathematics</b> marks.
          Only students who sat all three subjects appear here.</p>
+      <div class="controls">
+        <div class="search">
+          <svg><use href="#i-search"/></svg>
+          <input id="pcmQ" type="search" autocomplete="off" placeholder="Search by name, roll number or college…" aria-label="Search PCM merit list" />
+          <button class="clear-q" id="pcmClearQ" hidden aria-label="Clear"><svg><use href="#i-close"/></svg></button>
+        </div>
+      </div>
       <div class="table-head" id="pcmHead">
         <span>Merit</span><span>Roll</span><span>Name</span><span>Institution</span><span class="num">GPA</span><span class="num">PCM</span><span></span>
       </div>

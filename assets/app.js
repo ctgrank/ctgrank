@@ -728,6 +728,15 @@ function setView(v) {
 }
 
 /* PCM merit list — GPA first, then combined PCM marks. */
+function pcmMatches(i, q, digits) {
+  const ds = S.ds;
+  if (!q) return true;
+  if (digits) return ds.rollS[i].includes(q);
+  return ds.nameL[i].includes(q) ||
+         ds.schoolL[ds.sid[i]].includes(q) ||
+         ds.rollS[i].includes(q);
+}
+
 function renderPcm() {
   const ds = S.ds;
   if (!ds || !ds.pcm) return;
@@ -737,11 +746,19 @@ function renderPcm() {
     S.pcmRank = new Map();
     S.pcmOrder.forEach((i, r) => S.pcmRank.set(i, r + 1));
   }
-  const list = S.pcmOrder;
-  $('#pcmFoot').textContent =
-    `${nf(list.length)} of ${nf(ds.n)} students sat Physics, Chemistry and Mathematics`;
-  const h = rowH();
-  $('#pcmSpacer').style.height = (list.length * h) + 'px';
+  const q = (S.pcmQ || '').trim().toLowerCase();
+  const digits = /^\d+$/.test(q);
+  S.pcmRows = q ? S.pcmOrder.filter(i => pcmMatches(i, q, digits)) : S.pcmOrder;
+
+  const list = S.pcmRows;
+  const clear = $('#pcmClearQ');
+  if (clear) clear.hidden = !q;
+
+  $('#pcmFoot').textContent = q
+    ? `${nf(list.length)} match${list.length === 1 ? '' : 'es'} for “${(S.pcmQ || '').trim()}” — of ${nf(S.pcmOrder.length)} who sat all three`
+    : `${nf(list.length)} of ${nf(ds.n)} students sat Physics, Chemistry and Mathematics`;
+
+  $('#pcmSpacer').style.height = (list.length * rowH()) + 'px';
   paintPcm();
 }
 
@@ -751,10 +768,11 @@ function paintPcm() {
   pcmRaf = requestAnimationFrame(() => {
     const ds = S.ds;
     if (!ds || !S.pcmOrder) return;
-    const list = S.pcmOrder, sc = $('#pcmScroll'), box = $('#pcmRows');
+    const list = S.pcmRows || S.pcmOrder, sc = $('#pcmScroll'), box = $('#pcmRows');
     const h = rowH();
     const first = Math.max(0, Math.floor(sc.scrollTop / h) - 6);
     const last = Math.min(list.length, first + Math.ceil(sc.clientHeight / h) + 12);
+    const q = (S.pcmQ || '').trim().toLowerCase();
     let html = '';
     for (let k = first; k < last; k++) {
       const i = list[k];
@@ -762,9 +780,9 @@ function paintPcm() {
       const cls = g >= 500 ? 'pill-g5' : g >= 400 ? 'pill-g4' : 'pill-g0';
       html += `<div class="row" data-i="${i}" style="top:${k * h}px" role="button" tabindex="0">
         <span class="rk ${k < 3 ? 'top' : ''}">${nf(k + 1)}</span>
-        <span class="rl">${ds.rollS[i]}</span>
-        <span class="nm">${esc(ds.name[i])}</span>
-        <span class="sc">${esc(ds.schools[ds.sid[i]])}</span>
+        <span class="rl">${hl(ds.rollS[i], q)}</span>
+        <span class="nm">${hl(ds.name[i], q)}</span>
+        <span class="sc">${hl(ds.schools[ds.sid[i]], q)}</span>
         <span class="num c-gpa"><span class="pill ${cls}">${gpaTxt(g)}</span></span>
         <span class="num c-tot"><b>${ds.pcm[i]}</b></span>
         <span class="go">›</span>
@@ -845,6 +863,21 @@ function wire() {
   $('#pcmRows').addEventListener('click', e => {
     const r = e.target.closest('.row');
     if (r) openStudent(+r.dataset.i);
+  });
+  $('#pcmQ').addEventListener('input', e => {
+    S.pcmQ = e.target.value;
+    $('#pcmScroll').scrollTop = 0;
+    renderPcm();
+  });
+  $('#pcmQ').addEventListener('keydown', e => {
+    if (e.key === 'Escape') { e.target.value = ''; S.pcmQ = ''; renderPcm(); }
+  });
+  $('#pcmClearQ').addEventListener('click', () => {
+    $('#pcmQ').value = '';
+    S.pcmQ = '';
+    $('#pcmScroll').scrollTop = 0;
+    renderPcm();
+    $('#pcmQ').focus();
   });
   addEventListener('resize', debounce(() => { renderTable(); }, 120));
   $('#rows').addEventListener('click', e => {
