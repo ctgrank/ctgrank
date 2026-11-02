@@ -10,9 +10,8 @@ pages. Only the middle section is unique to this page.
 Giscus config comes from giscus.json (repo id, category id) — see
 GISCUS.md for the one-time setup.
 """
-import json
 import os
-import re
+from datetime import date
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.join(HERE, "..")
@@ -46,9 +45,6 @@ def main():
     header = header.replace(
         '<a href="reviews.html">',
         '<a href="reviews.html" class="active" aria-current="page">')
-
-    cfg = json.load(open(os.path.join(ROOT, "giscus.json"), encoding="utf-8"))
-    giscus = cfg["giscus"]
 
     page = f"""<!DOCTYPE html>
 <html lang="en" data-theme="light">
@@ -105,54 +101,30 @@ def main():
       <li><b>No personal data in public posts.</b> Don't paste phone numbers,
           addresses or full marksheets.</li>
     </ul>
-    <p class="rev-signin">Posting uses a <b>GitHub account</b> — it keeps the
-       site free of spam and bots. Don't have one? They're free and take a
-       minute to create.</p>
+    <p class="rev-signin">No sign-up and no email needed — just write and
+       post. <b>Anonymous is on by default</b>; untick it if you'd like your
+       name shown.</p>
   </section>
 
   <section class="card rev-box">
     <h2 id="write"><svg><use href="#i-star"/></svg> Leave a review</h2>
-    <div class="giscus" id="giscusBox"></div>
+    <div id="revForm"></div>
+    <p class="rev-status" id="revStatus" aria-live="polite"></p>
+  </section>
+
+  <section class="card rev-box rev-list-card">
+    <h2><svg><use href="#i-users"/></svg> What people are saying</h2>
+    <div id="revList" class="rev-list">
+      <p class="rev-empty">Loading reviews…</p>
+    </div>
     <noscript>
-      <p class="hint">Reviews need JavaScript enabled — they're loaded from
-         GitHub Discussions.</p>
+      <p class="hint">Posting a review needs JavaScript enabled.</p>
     </noscript>
   </section>
 </main>
 
 {footer}
-<script src="https://giscus.app/client.js"
-        data-repo="{giscus['repo']}"
-        data-repo-id="{giscus['repoId']}"
-        data-category="{giscus['category']}"
-        data-category-id="{giscus['categoryId']}"
-        data-mapping="specific"
-        data-term="Reviews"
-        data-strict="1"
-        data-reactions-enabled="1"
-        data-emit-metadata="0"
-        data-input-position="top"
-        data-theme="preferred_color_scheme"
-        data-lang="en"
-        data-loading="lazy"
-        crossorigin="anonymous"
-        async>
-</script>
-<script>
-  // Keep giscus in step with the site's own light/dark switch.
-  (function () {{
-    function post () {{
-      var theme = document.documentElement.getAttribute('data-theme') || 'light';
-      var iframe = document.querySelector('iframe.giscus-frame');
-      if (iframe) iframe.contentWindow.postMessage(
-        {{ giscus: {{ setConfig: {{ theme: theme }} }} }}, 'https://giscus.app');
-    }}
-    document.getElementById('themeBtn')
-      && document.getElementById('themeBtn').addEventListener('click',
-           function () {{ setTimeout(post, 60); }});
-    window.addEventListener('load', post);
-  }})();
-</script>
+<script src="assets/reviews.js"></script>
 </body>
 </html>
 """
@@ -166,7 +138,7 @@ def main():
         s = open(sm, encoding="utf-8").read()
         url = f"{SITE}/reviews.html"
         if url not in s:
-            entry = (f"<url><loc>{url}</loc><lastmod>{cfg.get('lastmod','2026-11-02')}"
+            entry = (f"<url><loc>{url}</loc><lastmod>{date.today().isoformat()}"
                      "</lastmod><changefreq>weekly</changefreq>"
                      "<priority>0.6</priority></url>")
             s = s.replace("</urlset>", entry + "</urlset>")

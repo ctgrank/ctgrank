@@ -7,3 +7,6 @@ CNAME
 # Rebuilt by tools/hsc2026_fetch_*.py; only the packed data/ datasets ship.
 /hsc2026/
 __pycache__/
+
+# local mock for the reviews API
+.review-store.json

@@ -494,4 +494,53 @@ mark { background: color-mix(in srgb, var(--accent) 40%, transparent); color: in
 .rev-box h2 { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
 .rev-box h2 svg { width: 20px; height: 20px; fill: var(--primary); }
 .rev-hero .eyebrow svg { fill: var(--primary); }
-.giscus { margin-top: 6px; }
+
+/* ── review composer ── */
+.rev-form { display: grid; gap: 10px; }
+.rev-form.is-compact { background: var(--bg-2, #f8fafc); padding: 12px;
+  border-radius: 10px; margin: 10px 0 4px; border: 1px solid var(--line); }
+.rev-fields { display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap; }
+.rev-field { display: grid; gap: 4px; flex: 1 1 200px; }
+.rev-field label { font-size: 12px; color: var(--muted); font-weight: 600; }
+.rev-input {
+  width: 100%; padding: 9px 11px; font: inherit;
+  border: 1px solid var(--line); border-radius: 8px;
+  background: var(--surface, #fff); color: var(--text);
+}
+.rev-input:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
+.rev-input:disabled { opacity: .5; }
+.rev-ta { resize: vertical; min-height: 96px; line-height: 1.55; }
+.rev-anon { display: flex; align-items: center; gap: 7px;
+  font-size: .9rem; color: var(--muted); cursor: pointer; padding-bottom: 9px; }
+.rev-anon input { width: 16px; height: 16px; accent-color: var(--primary); }
+.rev-count { font-size: 12px; color: var(--muted); text-align: right; min-height: 16px; }
+.rev-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.rev-msg { font-size: .87rem; color: var(--muted); }
+.rev-status { margin: 10px 0 0; font-size: .9rem; color: var(--primary); font-weight: 600; }
+
+/* ── review list ── */
+.rev-list { display: grid; gap: 14px; margin-top: 4px; }
+.rev-empty { color: var(--muted); margin: 4px 0; }
+.rev-card { border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
+.rev-card-h { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.rev-avatar {
+  width: 36px; height: 36px; flex: 0 0 36px; border-radius: 50%;
+  display: grid; place-items: center; font-weight: 700; font-size: .95rem;
+  background: var(--primary); color: #fff;
+}
+.rev-avatar.is-anon { background: var(--muted); }
+.rev-who { display: grid; }
+.rev-name { font-weight: 700; font-size: .95rem; }
+.rev-time { font-size: 12px; color: var(--muted); }
+.rev-text { margin: 0 0 10px; white-space: pre-wrap; word-wrap: break-word;
+  line-height: 1.6; }
+.rev-card-f { display: flex; gap: 8px; }
+.rev-reply { padding: 5px 12px; font-size: .85rem; }
+.rev-thread { display: grid; gap: 10px; margin-top: 12px; }
+.rev-comment { display: flex; gap: 10px; padding-left: 8px;
+  border-left: 2px solid var(--line); }
+.rev-comment .rev-avatar { width: 28px; height: 28px; flex-basis: 28px; font-size: .8rem; }
+.rev-comment-b { flex: 1; min-width: 0; }
+.rev-comment-h { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.rev-comment-h b { font-size: .9rem; }
+.rev-comment .rev-text { margin: 2px 0 0; font-size: .93rem; }
