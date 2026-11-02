@@ -644,47 +644,6 @@ function renderCompare() {
   });
 }
 
-/* ──────────────────────────────── CSV ──────────────────────────────── */
-function download(name, text) {
-  const url = URL.createObjectURL(new Blob(['\ufeff' + text], { type: 'text/csv;charset=utf-8' }));
-  const a = document.createElement('a');
-  a.href = url; a.download = name; a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-}
-function csvCell(v) { return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
-
-function exportStudents() {
-  const ds = S.ds;
-  const head = ['rank', 'roll', 'name', 'institution', 'gpa', 'total_marks'];
-  const defs = ds.meta.subjects;
-  if (ds.subj) defs.forEach(d => head.push(d.name.toLowerCase().replace(/[^a-z0-9]+/g, '_')));
-  const lines = [head.join(',')];
-  // the button says "the rows below", so export the same numbers the table shows
-  const inInst = S.school !== '';
-  S.rows.forEach((i, k) => {
-    const row = [inInst ? k + 1 : i + 1, ds.roll[i], csvCell(ds.name[i]),
-      csvCell(ds.schools[ds.sid[i]]),
-      ds.gpa[i] < 0 ? '' : gpaTxt(ds.gpa[i]), ds.total[i] < 0 ? '' : ds.total[i]];
-    if (ds.subj) {
-      const s = subjectsOf(i);
-      defs.forEach((_, k) => row.push(s && s[k] !== NO_MARK ? s[k] : ''));
-    }
-    lines.push(row.join(','));
-  });
-  download(`${ds.meta.id}_students.csv`, lines.join('\n'));
-  toast(`Exported ${nf(S.rows.length)} rows`);
-}
-
-function exportSchools() {
-  const q = $('#qSchool').value.trim().toLowerCase();
-  const list = aggregate().filter(a => !q || S.ds.schools[a.sid].toLowerCase().includes(q));
-  const lines = [['rank', 'institution', 'students', 'gpa5', 'avg_gpa', 'best_rank'].join(',')];
-  list.forEach((a, k) => lines.push([k + 1, csvCell(S.ds.schools[a.sid]), a.n, a.g5,
-    a.avg ? a.avg.toFixed(2) : '', a.best].join(',')));
-  download(`${S.ds.meta.id}_institutions.csv`, lines.join('\n'));
-  toast(`Exported ${nf(list.length)} institutions`);
-}
-
 /* ─────────────────────────────── URL state ─────────────────────────── */
 function writeUrl(push) {
   const p = new URLSearchParams();
@@ -895,7 +854,6 @@ function wire() {
   // schools
   $('#qSchool').addEventListener('input', debounce(renderSchools, 140));
   $('#schoolSort').addEventListener('change', e => { S.schoolSort = e.target.value; renderSchools(); });
-  $('#csvSchoolBtn').addEventListener('click', exportSchools);
   $('#schoolBody').addEventListener('click', e => {
     const tr = e.target.closest('tr'); if (!tr) return;
     $('#schoolFilter').value = tr.dataset.sid;
@@ -907,9 +865,6 @@ function wire() {
   // compare
   $('#cmpBtn').addEventListener('click', doCompare);
   [$('#cmpA'), $('#cmpB')].forEach(el => el.addEventListener('keydown', e => { if (e.key === 'Enter') doCompare(); }));
-
-  // export
-  $('#csvBtn').addEventListener('click', exportStudents);
 
   // modal
   $('#modal').addEventListener('click', e => { if (e.target.closest('[data-close]')) closeModal(); });

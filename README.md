@@ -8,7 +8,7 @@
 
 A dependency-free static web app: pick an **exam → year → group**, then search ~530,000 ranked
 results by name, roll number or institution, open any student for their **subject-wise marks**,
-compare two students, browse the **top institutions**, and export anything to CSV.
+compare two students, and browse the **top institutions**.
 
 ```
 index.html          the whole app (single page)
