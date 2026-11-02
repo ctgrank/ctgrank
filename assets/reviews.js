@@ -296,7 +296,9 @@
         postJson('/api/admin', { action: 'ping' }, { 'x-admin-key': k })
           .then(function (res) {
             btn.disabled = false;
-            if (res.status === 401) throw new Error('That key was rejected.');
+            if (res.status === 401 || res.status === 429) {
+              throw new Error((res.d && res.d.error) || 'That key was rejected.');
+            }
             if (!res.ok) throw new Error('Moderation is unavailable.');
             adminKey = k;
             try { sessionStorage.setItem(ADMIN_SESSION, k); } catch (e) {}

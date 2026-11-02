@@ -127,3 +127,30 @@ It writes to `.review-store.json` (gitignored).
 
 The functions only run on Pages. On Surge or GitHub Pages the page still
 loads, but shows "Reviews are unavailable right now" instead of failing.
+
+## Changing the key (including to a memorable password)
+
+`ADMIN_KEY` is an ordinary encrypted environment variable, so you can set it to
+anything you like — a random string *or* a password you can remember.
+
+1. Workers & Pages → **ctgrank** → Settings → **Environment variables**
+2. Edit `ADMIN_KEY`, type the new value, tick **Encrypt**, save
+3. **Deployments → ⋯ → Retry deployment** — the old key keeps working until a
+   new build finishes, so retry straight away
+
+**Pick a passphrase, not a single word.** The key travels in a request header, so
+anyone who guesses it can delete every review. Three or four unrelated words
+(`purple-tractor-canvas-91`) are both memorable and effectively unguessable.
+Avoid anything from a password breach list, and don't reuse an email or bank
+password.
+
+### Wrong-key lockout
+
+Because the key can now be a password, `/api/admin` throttles guessing:
+
+- **8 wrong attempts** from one IP → that IP is locked out for **10 minutes**
+- A correct key immediately resets the counter, so ordinary typos never add up
+- The counter expires on its own after 24 hours
+
+If you lock yourself out, just wait 10 minutes. Your visitors are unaffected —
+posting and replying are separate endpoints and never throttled by this.
