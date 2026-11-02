@@ -566,9 +566,7 @@ mark { background: color-mix(in srgb, var(--accent) 40%, transparent); color: in
   vertical-align: middle; white-space: nowrap;
 }
 .rev-comment-h { display: flex; align-items: center; flex-wrap: wrap; }
-/* the pill is the whole name on admin posts, so it needs no offset */
-.rev-name > .rev-admin-tag:first-child,
-.rev-comment-h b > .rev-admin-tag:first-child { margin-left: 0; }
+.rev-as-admin .rev-admin-tag { margin-left: 4px; }
 
 /* Composer notice shown instead of the name box while signed in. */
 .rev-as-admin {

@@ -26,17 +26,27 @@ export function isAdmin(request, env) {
   return safeEqual(request.headers.get('x-admin-key') || '', env.ADMIN_KEY);
 }
 
+/* Name shown on moderator posts. Keep in step with MOD_NAME in
+   assets/reviews.js, which uses it for the composer label only — the value
+   that actually gets stored is decided here. */
+export const MOD_NAME = 'Jahin';
+
+/* Names nobody may claim from the name box. Without this, a visitor could
+   type "Jahin" and produce a post that looks like it came from the site
+   owner. Compared case-insensitively. */
+const RESERVED = ['admin', 'administrator', 'moderator', 'mod', 'owner',
+                  'shikhor', MOD_NAME.toLowerCase()];
+
 /* The display name a post is allowed to use.
-   Moderators are always "Admin". Everyone else is "Anonymous" when the box
-   is empty or unticked, and is stopped from reserving "Admin" for themselves. */
+   Moderators post as MOD_NAME with an Admin badge; everyone else is
+   "Anonymous" when the box is empty, unticked, or trying to claim a
+   reserved identity. */
 export function authorFor(isMod, body) {
-  if (isMod) return { name: 'Admin', anon: false, admin: true };
+  if (isMod) return { name: MOD_NAME, anon: false, admin: true };
 
   const anon = !!body.anon;
   const raw = String(body.name || '').trim();
-  // Reserve the moderator identity. Without this, typing "admin" in the name
-  // box would produce a post indistinguishable from a real moderator reply.
-  const claimedAdmin = raw.toLowerCase() === 'admin';
-  const name = anon || !raw || claimedAdmin ? 'Anonymous' : raw;
-  return { name, anon: anon || claimedAdmin, admin: false };
+  const claimed = RESERVED.indexOf(raw.toLowerCase()) !== -1;
+  const name = anon || !raw || claimed ? 'Anonymous' : raw;
+  return { name, anon: anon || claimed, admin: false };
 }

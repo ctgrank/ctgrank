@@ -62,11 +62,8 @@
     var head = el('div', 'rev-card-h');
     head.appendChild(avatar(r.name, r.anon));
     var who = el('div', 'rev-who');
-    // Admin posts show the pill instead of the name, not alongside it —
-    // otherwise the name line reads "AdminAdmin".
-    var nm = el('div', 'rev-name');
+    var nm = el('div', 'rev-name', r.name || 'Anonymous');
     if (r.admin) nm.appendChild(el('span', 'rev-admin-tag', 'Admin'));
-    else nm.textContent = r.name || 'Anonymous';
     who.appendChild(nm);
     who.appendChild(el('div', 'rev-time', ago(r.ts)));
     head.appendChild(who);
@@ -90,9 +87,8 @@
       cw.appendChild(avatar(c.name, c.anon));
       var inner = el('div', 'rev-comment-b');
       var ch = el('div', 'rev-comment-h');
-      var cn = el('b');
+      var cn = el('b', null, c.name || 'Anonymous');
       if (c.admin) cn.appendChild(el('span', 'rev-admin-tag', 'Admin'));
-      else cn.textContent = c.name || 'Anonymous';
       ch.appendChild(cn);
       ch.appendChild(el('span', 'rev-time', ' · ' + ago(c.ts)));
       inner.appendChild(ch);
@@ -134,12 +130,11 @@
     var name = null, cb = null;
     if (adminKey) {
       var asAdmin = el('div', 'rev-as-admin');
-      var tag = el('span', 'rev-admin-tag', 'Admin');
-      var strong = el('b', null, 'Posting as ');
-      strong.appendChild(tag);
+      var strong = el('b', null, 'Posting as ' + MOD_NAME + ' ');
+      strong.appendChild(el('span', 'rev-admin-tag', 'Admin'));
       asAdmin.appendChild(strong);
       asAdmin.appendChild(el('span', 'rev-as-admin-note',
-        'Signed in as moderator — your posts are labelled Admin.'));
+        'Signed in as moderator — your posts show your name with an Admin badge.'));
       f.appendChild(asAdmin);
     } else {
       var nameWrap = el('div', 'rev-field');
@@ -244,6 +239,9 @@
   var ADMIN_SESSION = 'shikhor-admin-key';
   var adminKey = null;
   var rebuildComposer = null;
+  // Display-only: the name that actually gets stored is decided by the
+  // server (MOD_NAME in functions/api/_auth.js). Keep the two in step.
+  var MOD_NAME = 'Jahin';
 
   function adminOn() { return !!adminKey; }
 
@@ -380,12 +378,12 @@
         url: '/api/reviews',
         placeholder: 'What worked, what didn’t, what should Shikhor add next?',
         max: 1000,
-        submitLabel: adminKey ? 'Post as Admin' : 'Post review',
+        submitLabel: adminKey ? 'Post as ' + MOD_NAME : 'Post review',
         onDone: function (d) {
           state.unshift(d.review);
           render();
           statusEl.textContent = adminKey
-            ? 'Posted as Admin.' : 'Thanks — your review is up.';
+            ? 'Posted as ' + MOD_NAME + '.' : 'Thanks — your review is up.';
           setTimeout(function () { statusEl.textContent = ''; }, 4000);
         }
       }));

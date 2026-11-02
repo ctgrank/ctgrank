@@ -158,8 +158,14 @@ posting and replying are separate endpoints and never throttled by this.
 ### Posting as Admin
 
 While signed in as a moderator, the composer drops the name box and posts as
-**Admin**, with an amber badge on the post. Sign out to post normally again.
+**Jahin** with an amber **Admin** badge, so official replies are obvious. Sign
+out to post normally again.
 
-The badge is assigned by the **server** from your moderator key, never from
-the name box — so a visitor cannot fake it. Anyone who types "Admin" as their
-name is shown as **Anonymous** instead.
+Both parts are assigned by the **server** from your moderator key, never from
+the name box — a visitor cannot fake either one. Anyone typing "Jahin",
+"Admin", "Owner", "Shikhor" or similar as their name is shown as
+**Anonymous** instead.
+
+To change the name on moderator posts, edit `MOD_NAME` in
+`functions/api/_auth.js` and keep `MOD_NAME` in `assets/reviews.js` in step
+(the second one only labels the composer).

@@ -18,6 +18,7 @@ ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 STORE = os.path.join(ROOT, ".review-store.json")
 # Local stand-in for the ADMIN_KEY secret. Mirror whatever you set on Pages.
 ADMIN_KEY = os.environ.get("ADMIN_KEY", "letmein")
+MOD_NAME = "Jahin"   # keep in step with functions/api/_auth.js
 
 
 def clean(s):
@@ -103,9 +104,10 @@ class Handler(SimpleHTTPRequestHandler):
         raw_name = clean(body.get("name"))[:40]
         anon = bool(body.get("anon"))
         if is_mod:
-            name, anon, admin = "Admin", False, True
+            name, anon, admin = MOD_NAME, False, True
         else:
-            claimed = raw_name.strip().lower() == "admin"
+            RESERVED = {"admin","administrator","moderator","mod","owner","shikhor", MOD_NAME.lower()}
+            claimed = raw_name.strip().lower() in RESERVED
             name = "Anonymous" if (anon or not raw_name or claimed) else raw_name
             anon = anon or claimed
             admin = False
