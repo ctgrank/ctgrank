@@ -97,9 +97,18 @@ class Handler(SimpleHTTPRequestHandler):
             return self._json({"error": "Unknown action."}, 400)
 
         text = clean(body.get("text"))
-        anon = bool(body.get("anon"))
+        # Mirrors functions/api/_auth.js authorFor(): the Admin identity comes
+        # from the moderator key, never from the request body.
+        is_mod = (self.headers.get("x-admin-key") or "") == ADMIN_KEY
         raw_name = clean(body.get("name"))[:40]
-        name = "Anonymous" if (anon or not raw_name) else raw_name
+        anon = bool(body.get("anon"))
+        if is_mod:
+            name, anon, admin = "Admin", False, True
+        else:
+            claimed = raw_name.strip().lower() == "admin"
+            name = "Anonymous" if (anon or not raw_name or claimed) else raw_name
+            anon = anon or claimed
+            admin = False
 
         if path == "/api/reviews":
             if len(text) < 3:
@@ -107,7 +116,7 @@ class Handler(SimpleHTTPRequestHandler):
             if len(text) > 1000:
                 return self._json({"error": "Keep it under 1000 characters."}, 400)
             lst = load()
-            r = {"id": uid(), "name": name, "anon": anon, "text": text,
+            r = {"id": uid(), "name": name, "anon": anon, "admin": admin, "text": text,
                  "ts": int(time.time() * 1000), "comments": []}
             lst.insert(0, r)
             save(lst)
@@ -119,7 +128,7 @@ class Handler(SimpleHTTPRequestHandler):
             lst = load()
             for r in lst:
                 if r["id"] == str(body.get("reviewId")):
-                    c = {"id": uid(), "name": name, "anon": anon, "text": text,
+                    c = {"id": uid(), "name": name, "anon": anon, "admin": admin, "text": text,
                          "ts": int(time.time() * 1000)}
                     r.setdefault("comments", []).append(c)
                     save(lst)

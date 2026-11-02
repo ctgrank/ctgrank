@@ -10,6 +10,8 @@
 //
 // Requires a KV namespace bound as REVIEWS — see REVIEWS.md.
 
+import { isAdmin, authorFor } from './_auth.js';
+
 const KEY = 'reviews:v1';
 const MAX_REVIEWS = 500;
 const MAX_TEXT = 1000;
@@ -85,18 +87,22 @@ export async function onRequestPost({ request, env }) {
   if (text.length > MAX_TEXT)
     return json({ error: `Keep it under ${MAX_TEXT} characters.` }, 400);
 
-  if (await throttled(env, ip))
+  // Decided server-side: a moderator posts as Admin, everyone else cannot
+  // claim that name. Moderators also skip the per-minute throttle so they
+  // can reply to several reviews in a row.
+  const mod = isAdmin(request, env);
+
+  if (!mod && (await throttled(env, ip)))
     return json({ error: 'Slow down a moment, then try again.' }, 429);
 
-  const anon = !!body.anon;
-  const rawName = clean(body.name).slice(0, MAX_NAME);
-  const name = anon || !rawName ? 'Anonymous' : rawName;
+  const author = authorFor(mod, body);
 
   const list = await load(env);
   const review = {
     id: uid(),
-    name,
-    anon,
+    name: author.name,
+    anon: author.anon,
+    admin: author.admin,
     text,
     ts: Date.now(),
     comments: [],

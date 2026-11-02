@@ -154,3 +154,12 @@ Because the key can now be a password, `/api/admin` throttles guessing:
 
 If you lock yourself out, just wait 10 minutes. Your visitors are unaffected —
 posting and replying are separate endpoints and never throttled by this.
+
+### Posting as Admin
+
+While signed in as a moderator, the composer drops the name box and posts as
+**Admin**, with an amber badge on the post. Sign out to post normally again.
+
+The badge is assigned by the **server** from your moderator key, never from
+the name box — so a visitor cannot fake it. Anyone who types "Admin" as their
+name is shown as **Anonymous** instead.

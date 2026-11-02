@@ -1,4 +1,6 @@
 // POST /api/reviews/comment → { reviewId, name, text, anon }
+
+import { isAdmin, authorFor } from '../_auth.js';
 // Appends a reply to an existing review.
 
 const KEY = 'reviews:v1';
@@ -60,20 +62,22 @@ export async function onRequestPost({ request, env }) {
 
   const k = `rlc:${ip}`;
   const hits = parseInt((await env.REVIEWS.get(k)) || '0', 10) || 0;
-  if (hits >= REPLIES_PER_MINUTE)
+  if (!isAdmin(request, env) && hits >= REPLIES_PER_MINUTE)
     return json({ error: 'Slow down a moment, then try again.' }, 429);
-  await env.REVIEWS.put(k, String(hits + 1), { expirationTtl: 60 });
+  if (!isAdmin(request, env)) await env.REVIEWS.put(k, String(hits + 1), { expirationTtl: 60 });
 
   const list = await load(env);
   const review = list.find((r) => r.id === String(body.reviewId || ''));
   if (!review) return json({ error: 'That review no longer exists.' }, 404);
 
-  const anon = !!body.anon;
-  const rawName = clean(body.name).slice(0, MAX_NAME);
+  // Same rule as a new review: the Admin identity comes from the moderator
+  // key, never from the request body.
+  const author = authorFor(isAdmin(request, env), body);
   const comment = {
     id: uid(),
-    name: anon || !rawName ? 'Anonymous' : rawName,
-    anon,
+    name: author.name,
+    anon: author.anon,
+    admin: author.admin,
     text,
     ts: Date.now(),
   };

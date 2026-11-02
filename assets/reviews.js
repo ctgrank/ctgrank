@@ -46,6 +46,11 @@
   function avatar(name, anon) {
     var n = el('div', 'rev-avatar' + (anon ? ' is-anon' : ''));
     n.textContent = (anon ? '?' : (name || '?').trim().charAt(0).toUpperCase());
+    return n;
+  }
+  function _unusedAvatar(name, anon) {
+    var n = el('div', 'rev-avatar' + (anon ? ' is-anon' : ''));
+    n.textContent = (anon ? '?' : (name || '?').trim().charAt(0).toUpperCase());
     n.setAttribute('aria-hidden', 'true');
     return n;
   }
@@ -57,7 +62,12 @@
     var head = el('div', 'rev-card-h');
     head.appendChild(avatar(r.name, r.anon));
     var who = el('div', 'rev-who');
-    who.appendChild(el('div', 'rev-name', r.name || 'Anonymous'));
+    // Admin posts show the pill instead of the name, not alongside it —
+    // otherwise the name line reads "AdminAdmin".
+    var nm = el('div', 'rev-name');
+    if (r.admin) nm.appendChild(el('span', 'rev-admin-tag', 'Admin'));
+    else nm.textContent = r.name || 'Anonymous';
+    who.appendChild(nm);
     who.appendChild(el('div', 'rev-time', ago(r.ts)));
     head.appendChild(who);
     wrap.appendChild(head);
@@ -80,7 +90,10 @@
       cw.appendChild(avatar(c.name, c.anon));
       var inner = el('div', 'rev-comment-b');
       var ch = el('div', 'rev-comment-h');
-      ch.appendChild(el('b', null, c.name || 'Anonymous'));
+      var cn = el('b');
+      if (c.admin) cn.appendChild(el('span', 'rev-admin-tag', 'Admin'));
+      else cn.textContent = c.name || 'Anonymous';
+      ch.appendChild(cn);
       ch.appendChild(el('span', 'rev-time', ' · ' + ago(c.ts)));
       inner.appendChild(ch);
       var ct = el('p', 'rev-text');
@@ -116,24 +129,38 @@
     var f = el('form', 'rev-form' + (opts.compact ? ' is-compact' : ''));
     var nameRow = el('div', 'rev-fields');
 
-    var nameWrap = el('div', 'rev-field');
-    nameWrap.appendChild(el('label', null, 'Name (optional)'));
-    var name = el('input', 'rev-input');
-    name.type = 'text';
-    name.maxLength = 40;
-    name.placeholder = 'Your name';
-    name.autocomplete = 'name';
-    nameWrap.appendChild(name);
-    nameRow.appendChild(nameWrap);
+    // While signed in as a moderator the name row is replaced outright: the
+    // server decides the identity, so there is nothing for the user to type.
+    var name = null, cb = null;
+    if (adminKey) {
+      var asAdmin = el('div', 'rev-as-admin');
+      var tag = el('span', 'rev-admin-tag', 'Admin');
+      var strong = el('b', null, 'Posting as ');
+      strong.appendChild(tag);
+      asAdmin.appendChild(strong);
+      asAdmin.appendChild(el('span', 'rev-as-admin-note',
+        'Signed in as moderator — your posts are labelled Admin.'));
+      f.appendChild(asAdmin);
+    } else {
+      var nameWrap = el('div', 'rev-field');
+      nameWrap.appendChild(el('label', null, 'Name (optional)'));
+      name = el('input', 'rev-input');
+      name.type = 'text';
+      name.maxLength = 40;
+      name.placeholder = 'Your name';
+      name.autocomplete = 'name';
+      nameWrap.appendChild(name);
+      nameRow.appendChild(nameWrap);
 
-    var anonWrap = el('label', 'rev-anon');
-    var cb = el('input');
-    cb.type = 'checkbox';
-    cb.checked = true;                 // anonymous by default
-    anonWrap.appendChild(cb);
-    anonWrap.appendChild(el('span', null, 'Post anonymously'));
-    nameRow.appendChild(anonWrap);
-    f.appendChild(nameRow);
+      var anonWrap = el('label', 'rev-anon');
+      cb = el('input');
+      cb.type = 'checkbox';
+      cb.checked = true;                 // anonymous by default
+      anonWrap.appendChild(cb);
+      anonWrap.appendChild(el('span', null, 'Post anonymously'));
+      nameRow.appendChild(anonWrap);
+      f.appendChild(nameRow);
+    }
 
     var ta = el('textarea', 'rev-input rev-ta');
     ta.placeholder = opts.placeholder;
@@ -165,8 +192,8 @@
     f.appendChild(actions);
 
     // anonymous disables the name box (and vice versa)
-    function sync() { name.disabled = cb.checked; if (cb.checked) name.value = ''; }
-    cb.addEventListener('change', sync); sync();
+    function sync() { if (!name || !cb) return; name.disabled = cb.checked; if (cb.checked) name.value = ''; }
+    if (cb) { cb.addEventListener('change', sync); sync(); }
 
     f.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -176,10 +203,12 @@
       msg.textContent = 'Posting…';
       postJson(opts.url, {
         text: text,
-        name: cb.checked ? '' : name.value,
-        anon: cb.checked,
+        // In moderator mode the server assigns "Admin"; sending a name here
+        // would be ignored anyway, so don't send one.
+        name: adminKey ? '' : (cb.checked ? '' : name.value),
+        anon: adminKey ? false : cb.checked,
         reviewId: opts.reviewId
-      })
+      }, adminKey ? { 'x-admin-key': adminKey } : null)
         .then(function (res) {
           if (!res.ok) { throw new Error(res.d.error || 'Something went wrong.'); }
           ta.value = ''; count.textContent = '';
@@ -214,6 +243,7 @@
   var state = [];
   var ADMIN_SESSION = 'shikhor-admin-key';
   var adminKey = null;
+  var rebuildComposer = null;
 
   function adminOn() { return !!adminKey; }
 
@@ -319,6 +349,7 @@
     if (!host) return;
     host.textContent = '';
     host.appendChild(adminBar());
+    if (typeof rebuildComposer === 'function') rebuildComposer();
   }
 
   function init() {
@@ -341,19 +372,26 @@
       }).catch(function () {});
     }
 
-    var f = composer({
-      url: '/api/reviews',
-      placeholder: 'What worked, what didn’t, what should Shikhor add next?',
-      max: 1000,
-      submitLabel: 'Post review',
-      onDone: function (d) {
-        state.unshift(d.review);
-        render();
-        statusEl.textContent = 'Thanks — your review is up.';
-        setTimeout(function () { statusEl.textContent = ''; }, 4000);
-      }
-    });
-    formEl.appendChild(f);
+    // Rebuilt on every moderator sign-in/out: the composer hides the name
+    // row and posts as Admin while a key is held, so it can't be static.
+    function buildComposer() {
+      formEl.textContent = '';
+      formEl.appendChild(composer({
+        url: '/api/reviews',
+        placeholder: 'What worked, what didn’t, what should Shikhor add next?',
+        max: 1000,
+        submitLabel: adminKey ? 'Post as Admin' : 'Post review',
+        onDone: function (d) {
+          state.unshift(d.review);
+          render();
+          statusEl.textContent = adminKey
+            ? 'Posted as Admin.' : 'Thanks — your review is up.';
+          setTimeout(function () { statusEl.textContent = ''; }, 4000);
+        }
+      }));
+    }
+    rebuildComposer = buildComposer;
+    buildComposer();
 
     fetch('/api/reviews')
       .then(function (r) {
