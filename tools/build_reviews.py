@@ -44,6 +44,11 @@ def main():
         '<a href="#compareView" data-goto="compare">',
         '<a href="index.html#compareView" data-goto="compare">')
     header = header.replace('<a href="#about">', '<a href="index.html#about">')
+    # The footer is lifted verbatim too, and its links are bare same-page
+    # anchors (#picker / #about) that only exist on index.html. Left alone
+    # they silently do nothing on this page, so point them at the homepage.
+    footer = footer.replace('<a href="#picker">', '<a href="index.html#picker">')
+    footer = footer.replace('<a href="#about">', '<a href="index.html#about">')
     header = header.replace(
         '<a href="reviews.html">',
         '<a href="reviews.html" class="active" aria-current="page">')

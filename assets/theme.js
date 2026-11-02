@@ -1,4 +1,8 @@
-// Standalone theme handler for pages that don't load app.js (reviews.html).
+// Shared shim for pages that don't load app.js (reviews.html).
+//
+// Covers the bits of chrome that app.js would otherwise wire up: the theme
+// toggle and the footer "Top" button. Without this the Top button is dead
+// markup, since its only listener lives in app.js.
 //
 // Deliberately a copy of initTheme()/setTheme() in app.js rather than a
 // shared import: app.js is one big IIFE and splitting it out risks the main
@@ -28,6 +32,13 @@
     btn.addEventListener('click', function () {
       setTheme(root.dataset.theme !== 'dark');
       try { localStorage.setItem(KEY, root.dataset.theme); } catch (e) {}
+    });
+  }
+
+  var top = document.getElementById('topBtn');
+  if (top) {
+    top.addEventListener('click', function () {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   }
 })();
