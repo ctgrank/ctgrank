@@ -127,6 +127,7 @@ def main():
 </main>
 
 {footer}
+<script src="assets/theme.js"></script>
 <script src="assets/reviews.js"></script>
 </body>
 </html>

@@ -6,6 +6,27 @@
   var $ = function (s) { return document.querySelector(s); };
   var listEl, formEl, statusEl, submitBtn, replyArea;
 
+  /* POST JSON and parse defensively. If the endpoint is missing (or a proxy
+     returns HTML), the visitor gets a plain sentence, not a JSON parser
+     error. */
+  function postJson(url, body, headers) {
+    return fetch(url, {
+      method: 'POST',
+      headers: Object.assign({ 'content-type': 'application/json' }, headers || {}),
+      body: JSON.stringify(body)
+    }).then(function (r) {
+      var type = r.headers.get('content-type') || '';
+      if (type.indexOf('application/json') === -1) {
+        var err = new Error(r.ok
+          ? 'Something went wrong — please try again.'
+          : 'This feature is unavailable right now.');
+        err.status = r.status;
+        throw err;
+      }
+      return r.json().then(function (d) { return { ok: r.ok, status: r.status, d: d }; });
+    });
+  }
+
   function ago(ts) {
     var s = Math.floor((Date.now() - ts) / 1000);
     if (s < 60) return 'just now';
@@ -153,19 +174,12 @@
       if (text.length < 2) { msg.textContent = 'Write something first.'; return; }
       submit.disabled = true;
       msg.textContent = 'Posting…';
-      fetch(opts.url, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          text: text,
-          name: cb.checked ? '' : name.value,
-          anon: cb.checked,
-          reviewId: opts.reviewId
-        })
+      postJson(opts.url, {
+        text: text,
+        name: cb.checked ? '' : name.value,
+        anon: cb.checked,
+        reviewId: opts.reviewId
       })
-        .then(function (r) {
-          return r.json().then(function (d) { return { ok: r.ok, d: d }; });
-        })
         .then(function (res) {
           if (!res.ok) { throw new Error(res.d.error || 'Something went wrong.'); }
           ta.value = ''; count.textContent = '';
@@ -219,14 +233,7 @@
       var body = { action: action };
       if (action === 'deleteReview') body.id = payload.id;
       else { body.reviewId = payload.reviewId; body.commentId = payload.id; }
-      fetch('/api/admin', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json', 'x-admin-key': adminKey },
-        body: JSON.stringify(body)
-      })
-        .then(function (r) {
-          return r.json().then(function (d) { return { ok: r.ok, d: d }; });
-        })
+      postJson('/api/admin', body, { 'x-admin-key': adminKey })
         .then(function (res) {
           if (!res.ok) throw new Error(res.d.error || 'Could not delete.');
           state = res.d.reviews || [];
@@ -286,15 +293,11 @@
         btn.disabled = true;
         // Verify before revealing any controls — don't trust the key just
         // because it was typed in.
-        fetch('/api/admin', {
-          method: 'POST',
-          headers: { 'content-type': 'application/json', 'x-admin-key': k },
-          body: JSON.stringify({ action: 'ping' })
-        })
-          .then(function (r) {
+        postJson('/api/admin', { action: 'ping' }, { 'x-admin-key': k })
+          .then(function (res) {
             btn.disabled = false;
-            if (r.status === 401) throw new Error('That key was rejected.');
-            if (!r.ok) throw new Error('Moderation is unavailable.');
+            if (res.status === 401) throw new Error('That key was rejected.');
+            if (!res.ok) throw new Error('Moderation is unavailable.');
             adminKey = k;
             try { sessionStorage.setItem(ADMIN_SESSION, k); } catch (e) {}
             initAdmin(); render();
@@ -326,11 +329,8 @@
     initAdmin();
     if (adminKey) {
       // re-validate a restored key; drop it silently if it no longer works
-      fetch('/api/admin', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json', 'x-admin-key': adminKey },
-        body: JSON.stringify({ action: 'ping' })
-      }).then(function (r) {
+      postJson('/api/admin', { action: 'ping' }, { 'x-admin-key': adminKey })
+      .then(function (r) {
         if (!r.ok) {
           adminKey = null;
           try { sessionStorage.removeItem(ADMIN_SESSION); } catch (e) {}
