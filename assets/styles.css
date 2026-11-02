@@ -432,6 +432,13 @@ mark { background: color-mix(in srgb, var(--accent) 40%, transparent); color: in
   .years { grid-template-columns: repeat(auto-fill, minmax(94px, 1fr)); gap: 9px; }
   .year-card .yc-year { font-size: 1.6rem; }
 }
+/* Four view tabs (Students / Schools / Compare / PCM) don't fit on one line
+   on a narrow phone and pushed the whole page into horizontal scroll. Let
+   them wrap to a second row instead. */
+@media (max-width: 560px) {
+  .seg-sm { flex-wrap: wrap; row-gap: 4px; }
+  .seg-sm .seg-btn { flex: 1 1 auto; min-width: 0; }
+}
 @media (max-width: 420px) {
   .hero { padding: 44px 14px 38px; }
   .stat { min-width: 96px; padding: 10px 14px; }
