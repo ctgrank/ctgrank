@@ -50,6 +50,7 @@
     replyBtn.type = 'button';
     replyBtn.textContent = 'Reply';
     foot.appendChild(replyBtn);
+    if (adminOn()) foot.appendChild(delBtn('Delete', 'deleteReview', { id: r.id }));
     wrap.appendChild(foot);
 
     var thread = el('div', 'rev-thread');
@@ -64,6 +65,10 @@
       var ct = el('p', 'rev-text');
       ct.textContent = c.text;
       inner.appendChild(ct);
+      if (adminOn()) {
+        var cdel = delBtn('Delete', 'deleteComment', { id: c.id, reviewId: r.id });
+        inner.appendChild(cdel);
+      }
       cw.appendChild(inner);
       thread.appendChild(cw);
     });
@@ -193,6 +198,55 @@
   }
 
   var state = [];
+  var ADMIN_SESSION = 'shikhor-admin-key';
+  var adminKey = null;
+
+  function adminOn() { return !!adminKey; }
+
+  function delBtn(label, action, payload) {
+    var b = el('button', 'rev-del');
+    b.type = 'button';
+    b.textContent = label;
+    b.title = action === 'deleteReview' ? 'Delete this review' : 'Delete this reply';
+    b.setAttribute('aria-label', b.title);
+    b.addEventListener('click', function (e) {
+      e.preventDefault();
+      var msg = action === 'deleteReview'
+        ? 'Delete this review and its replies? This cannot be undone.'
+        : 'Delete this reply?';
+      if (!window.confirm(msg)) return;
+      b.disabled = true;
+      var body = { action: action };
+      if (action === 'deleteReview') body.id = payload.id;
+      else { body.reviewId = payload.reviewId; body.commentId = payload.id; }
+      fetch('/api/admin', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'x-admin-key': adminKey },
+        body: JSON.stringify(body)
+      })
+        .then(function (r) {
+          return r.json().then(function (d) { return { ok: r.ok, d: d }; });
+        })
+        .then(function (res) {
+          if (!res.ok) throw new Error(res.d.error || 'Could not delete.');
+          state = res.d.reviews || [];
+          render();
+        })
+        .catch(function (err) {
+          b.disabled = false;
+          if (String(err.message).match(/authoris|401/i)) {
+            adminKey = null;
+            sessionStorage.removeItem(ADMIN_SESSION);
+            render();
+            window.alert('That admin key was rejected. Sign in again.');
+          } else {
+            window.alert(err.message);
+          }
+        });
+    });
+    return b;
+  }
+
   function render() {
     listEl.textContent = '';
     if (!state.length) {
@@ -204,11 +258,86 @@
     state.forEach(function (r) { listEl.appendChild(renderReview(r)); });
   }
 
+  /* Small moderator bar: sign in with the admin key, sign out again.
+     The key lives in sessionStorage for the tab only — never localStorage,
+     so it dies with the browser session. */
+  function adminBar() {
+    var bar = el('div', 'rev-adminbar');
+    if (adminOn()) {
+      var tag = el('span', 'rev-admin-tag');
+      tag.textContent = 'Moderator mode — delete buttons are visible';
+      var out = el('button', 'btn btn-ghost');
+      out.type = 'button';
+      out.textContent = 'Sign out';
+      out.addEventListener('click', function () {
+        adminKey = null;
+        sessionStorage.removeItem(ADMIN_SESSION);
+        initAdmin(); render();
+      });
+      bar.appendChild(tag); bar.appendChild(out);
+    } else {
+      var btn = el('button', 'btn btn-ghost');
+      btn.type = 'button';
+      btn.textContent = 'Moderate';
+      btn.addEventListener('click', function () {
+        var k = window.prompt('Moderator key:');
+        if (!k) return;
+        k = k.trim();
+        btn.disabled = true;
+        // Verify before revealing any controls — don't trust the key just
+        // because it was typed in.
+        fetch('/api/admin', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', 'x-admin-key': k },
+          body: JSON.stringify({ action: 'ping' })
+        })
+          .then(function (r) {
+            btn.disabled = false;
+            if (r.status === 401) throw new Error('That key was rejected.');
+            if (!r.ok) throw new Error('Moderation is unavailable.');
+            adminKey = k;
+            try { sessionStorage.setItem(ADMIN_SESSION, k); } catch (e) {}
+            initAdmin(); render();
+          })
+          .catch(function (err) {
+            btn.disabled = false;
+            window.alert(err.message);
+          });
+      });
+      bar.appendChild(btn);
+    }
+    return bar;
+  }
+
+  function initAdmin() {
+    var host = $('#revAdmin');
+    if (!host) return;
+    host.textContent = '';
+    host.appendChild(adminBar());
+  }
+
   function init() {
     listEl = $('#revList');
     formEl = $('#revForm');
     statusEl = $('#revStatus');
     if (!listEl || !formEl) return;
+
+    try { adminKey = sessionStorage.getItem(ADMIN_SESSION) || null; } catch (e) {}
+    initAdmin();
+    if (adminKey) {
+      // re-validate a restored key; drop it silently if it no longer works
+      fetch('/api/admin', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'x-admin-key': adminKey },
+        body: JSON.stringify({ action: 'ping' })
+      }).then(function (r) {
+        if (!r.ok) {
+          adminKey = null;
+          try { sessionStorage.removeItem(ADMIN_SESSION); } catch (e) {}
+          initAdmin(); render();
+        }
+      }).catch(function () {});
+    }
 
     var f = composer({
       url: '/api/reviews',

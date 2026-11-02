@@ -113,7 +113,10 @@ def main():
   </section>
 
   <section class="card rev-box rev-list-card">
-    <h2><svg><use href="#i-users"/></svg> What people are saying</h2>
+    <div class="rev-list-h">
+      <h2><svg><use href="#i-users"/></svg> What people are saying</h2>
+      <div id="revAdmin"></div>
+    </div>
     <div id="revList" class="rev-list">
       <p class="rev-empty">Loading reviews…</p>
     </div>

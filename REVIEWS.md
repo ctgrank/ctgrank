@@ -6,6 +6,14 @@ created by hand, because I can't reach your Cloudflare account.
 
 Roughly two minutes, then it's done permanently.
 
+## Step 0 — choose a moderator key
+
+This is the password that unlocks deleting reviews. Pick something long and
+unrelated to anything else — you'll type it into the site, not a login form.
+
+**Step 1 comes first**, because Pages won't let you add variables until the
+project exists with a deployment.
+
 ## Step 1 — create the KV namespace
 
 1. Open **https://dash.cloudflare.com**
@@ -23,7 +31,18 @@ Roughly two minutes, then it's done permanently.
    - KV namespace: **`shikhor-reviews`**
 4. **Save**
 
-## Step 3 — redeploy
+## Step 3 — add the moderator key
+
+1. Workers & Pages → **ctgrank** → **Settings** → **Environment variables**
+2. **Add variable**:
+   - Name: **`ADMIN_KEY`**
+   - Value: the key you chose in step 0
+3. Pick **Encrypt** (it's a secret — this hides it from the dashboard and logs)
+4. **Save**
+
+Set it for **both** Production and Preview if you use preview deployments.
+
+## Step 4 — redeploy
 
 Bindings only apply to new deployments.
 
@@ -67,14 +86,30 @@ review is displayed as text rather than executed.
 KV's free tier is 100,000 reads and 1,000 writes per day. A site of this size
 won't come close; you'd need thousands of reviews a day to hit it.
 
-## Moderation
+## Moderation — deleting a review
 
-There's no approval queue — posts appear instantly, as you chose. If spam
-becomes a problem:
+Posts appear instantly, as you chose. To remove one:
 
-- Edit or delete entries directly: **KV** → `shikhor-reviews` → the
-  `reviews:v1` key (it's one JSON array).
-- Or tell me and I'll add an approval flag, or a hidden admin view.
+1. Open **https://ctgrank.pages.dev/reviews.html**
+2. Click **Moderate** (top right of "What people are saying")
+3. Type your `ADMIN_KEY`
+4. Every review and every reply grows a red **Delete** button
+5. Delete, then **Sign out**
+
+How it's protected:
+
+| Guard | Detail |
+|---|---|
+| Key never reaches the page | held as an encrypted Pages secret, compared server-side |
+| Verified before use | the key is checked the moment you enter it; a wrong one never reveals controls |
+| Not stored permanently | kept in `sessionStorage`, so it dies when you close the tab |
+| Constant-time compare | the check doesn't leak the key through timing |
+| Stale keys dropped | a key restored from session is re-validated on load |
+
+You can also edit the store directly: **KV** → `shikhor-reviews` → the
+`reviews:v1` key (it's one JSON array).
+
+Forgotten the key? Just set a new one in step 3 and redeploy.
 
 ## Local testing
 

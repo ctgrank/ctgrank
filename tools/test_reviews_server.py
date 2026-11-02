@@ -16,6 +16,8 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 STORE = os.path.join(ROOT, ".review-store.json")
+# Local stand-in for the ADMIN_KEY secret. Mirror whatever you set on Pages.
+ADMIN_KEY = os.environ.get("ADMIN_KEY", "letmein")
 
 
 def clean(s):
@@ -68,6 +70,32 @@ class Handler(SimpleHTTPRequestHandler):
             return self._json({"error": "Malformed request."}, 400)
 
         path = self.path.split("?")[0]
+
+        if path == "/api/admin":
+            if (self.headers.get("x-admin-key") or "") != ADMIN_KEY:
+                return self._json({"error": "Not authorised."}, 401)
+            lst = load()
+            if body.get("action") == "deleteReview":
+                nxt = [r for r in lst if r["id"] != str(body.get("id"))]
+                if len(nxt) == len(lst):
+                    return self._json({"error": "Not found."}, 404)
+                save(nxt)
+                return self._json({"ok": True, "reviews": nxt})
+            if body.get("action") == "deleteComment":
+                for r in lst:
+                    if r["id"] == str(body.get("reviewId")):
+                        before = len(r.get("comments", []))
+                        r["comments"] = [c for c in r.get("comments", [])
+                                         if c["id"] != str(body.get("commentId"))]
+                        if len(r["comments"]) == before:
+                            return self._json({"error": "Not found."}, 404)
+                        save(lst)
+                        return self._json({"ok": True, "reviews": lst})
+                return self._json({"error": "Not found."}, 404)
+            if body.get("action") == "ping":
+                return self._json({"ok": True})
+            return self._json({"error": "Unknown action."}, 400)
+
         text = clean(body.get("text"))
         anon = bool(body.get("anon"))
         raw_name = clean(body.get("name"))[:40]
