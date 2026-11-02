@@ -124,19 +124,18 @@ function renderPicker() {
   $('#yearCards').innerHTML = years.map(y => {
     const has = GROUPS.some(g => findMeta(S.exam, y, g));
     const count = d.filter(m => m.exam === S.exam && m.year === y).reduce((a, b) => a + b.count, 0);
-    // HSC 2026 was collected straight from the board portal — spotlight it.
-    const spotlight = has && S.exam === 'HSC' && y === 2026;
+    // No year gets special treatment — HSC 2026 used to be spotlighted, but
+    // it is just one dataset among nineteen now.
     // Only "SOON" (no data yet) and "NEW" (newest) ribbons remain: the old
     // HOT / PART badges were noise, since every listed year is complete enough.
     let ribbon = '';
     if (!has) ribbon = '<span class="ribbon ribbon-soon">SOON</span>';
     else if (y === newest) ribbon = '<span class="ribbon ribbon-new">NEW</span>';
-    return `<button class="year-card ${y === S.year ? 'is-on' : ''}${spotlight ? ' is-spotlight' : ''}" data-year="${y}" ${has ? '' : 'disabled'}>
+    return `<button class="year-card ${y === S.year ? 'is-on' : ''}" data-year="${y}" ${has ? '' : 'disabled'}>
         ${ribbon}
         <div class="yc-exam">${S.exam}</div>
         <div class="yc-year">${String(y).slice(2)}</div>
         <div class="yc-count">${has ? nf(count) + ' students' : 'no data'}</div>
-        ${spotlight ? '<div class="yc-tag">Just added</div>' : ''}
       </button>`;
   }).join('');
 
@@ -644,6 +643,83 @@ function renderCompare() {
   });
 }
 
+/* ─────────────────────────────── print one result ─────────────────────── */
+/* Print / save-as-PDF for a single student.
+   window.print() would send the whole site to the printer — nav, tables and
+   all — so the card is rendered into a hidden iframe holding only this
+   result, and the dialog is opened from there. The live page is never
+   touched, so nothing leaks into an ordinary Ctrl+P. */
+function printStudent(i) {
+  const ds = S.ds;
+  const frame = document.createElement('iframe');
+  frame.setAttribute('aria-hidden', 'true');
+  frame.setAttribute('title', 'Print result');
+  frame.style.cssText =
+    'position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden;';
+  document.body.appendChild(frame);
+
+  const doc = frame.contentDocument;
+  if (!doc) {
+    frame.remove();
+    toast('Printing is not available in this browser.', false);
+    return;
+  }
+
+  // Resolve the stylesheet the same way the host page does, so this works
+  // from "/" and from the prerendered /hsc-2026-science/ style URLs alike.
+  const link = document.querySelector('link[rel="stylesheet"][href*="styles.css"]');
+  const cssHref = link ? link.href : new URL('assets/styles.css', location.href).href;
+
+  const m = ds.meta;
+  doc.open();
+  doc.write('<!doctype html><html><head><meta charset="utf-8">' +
+    '<title>' + esc(ds.name[i]) + ' — Roll ' + ds.roll[i] + ' — Shikhor</title>' +
+    '<link rel="stylesheet" href="' + esc(cssHref) + '">' +
+    '<style>' + [
+      '@page { size: A4 portrait; margin: 14mm; }',
+      '* { -webkit-print-color-adjust: exact; print-color-adjust: exact; }',
+      'html, body { background: #fff !important; color: #101828 !important; }',
+      'body { margin: 0; padding: 0; font: 14px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }',
+      '.print-head { display: flex; align-items: baseline; justify-content: space-between;',
+      '  gap: 12px; border-bottom: 2px solid #2563eb; padding-bottom: 8px; margin-bottom: 16px; }',
+      '.print-head .ph-brand { font-weight: 800; font-size: 17px; color: #2563eb; letter-spacing: .02em; }',
+      '.print-head .ph-sub { font-size: 11px; color: #5b6875; text-align: right; }',
+      '.print-foot { margin-top: 16px; padding-top: 8px; border-top: 1px solid #d7dee8;',
+      '  font-size: 10.5px; color: #5b6875; }',
+      '.scard { border: 1px solid #d7dee8 !important; border-radius: 12px; padding: 16px !important; }',
+      '.scard-top { padding-right: 0 !important; }'
+    ].join('') + '</style></head><body>' +
+    '<div class="print-head">' +
+      '<div class="ph-brand">Shikhor</div>' +
+      '<div class="ph-sub">' + esc(m.exam + ' ' + m.year) + ' &middot; ' + esc(m.group) +
+      '<br>Chattogram Board &middot; unofficial rank archive</div>' +
+    '</div>' +
+    studentCard(i, true) +
+    '<p class="print-foot">Printed from Shikhor (ctgrank.pages.dev) on ' +
+      esc(new Date().toLocaleDateString('en-GB')) + '. ' +
+      'Unofficial — always verify against your official marksheet or the board\u2019s own result portal. ' +
+      'Shikhor &copy; ' + new Date().getFullYear() + ' Jahin.</p>' +
+    '</body></html>');
+  doc.close();
+
+  const w = frame.contentWindow;
+  const cleanup = () => frame.remove();
+  w.addEventListener('afterprint', cleanup);
+  setTimeout(cleanup, 5 * 60 * 1000);   // safety net if afterprint never fires
+
+  // Open the dialog exactly once. The stylesheet may still be loading when
+  // the load event fires, so retry briefly — but never twice.
+  let opened = false;
+  const go = () => {
+    if (opened) return;
+    opened = true;
+    try { w.focus(); w.print(); } catch (e) { cleanup(); }
+  };
+  if (doc.readyState === 'complete') go(); else frame.onload = go;
+  setTimeout(go, 300);
+  toast('Opening print dialog…');
+}
+
 /* ─────────────────────────────── URL state ─────────────────────────── */
 function writeUrl(push) {
   const p = new URLSearchParams();
@@ -893,7 +969,7 @@ function wire() {
       try { await navigator.clipboard.writeText(url); toast('Link copied'); }
       catch { toast(url, false); }
     }
-    if (b.dataset.act === 'print') print();
+    if (b.dataset.act === 'print') printStudent(i);
     if (b.dataset.act === 'school') {
       $('#schoolFilter').value = ds.sid[i]; S.school = String(ds.sid[i]);
       closeModal(); applyFilters(); setView('students');
