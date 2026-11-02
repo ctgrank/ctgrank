@@ -476,3 +476,22 @@ mark { background: color-mix(in srgb, var(--accent) 40%, transparent); color: in
 .pcm-merit-b span { font-size: .9rem; color: var(--muted); }
 .pcm-merit-b span b { color: var(--text); }
 .pcm-merit-n { margin-top: 6px; font-size: 12px; color: var(--muted); }
+
+/* ── reviews page ── */
+.rev-hero { text-align: center; padding: 34px 16px 8px; }
+.rev-hero h1 { margin: 6px 0 10px; }
+.rev-hero .lede { max-width: 44rem; margin: 0 auto; color: var(--muted); }
+.rev-intro { max-width: 46rem; }
+.rev-rules { margin: 10px 0 14px; padding-left: 20px; }
+.rev-rules li { margin-bottom: 7px; color: var(--muted); }
+.rev-rules b { color: var(--text); }
+.rev-signin {
+  background: color-mix(in srgb, var(--primary) 7%, transparent);
+  border-left: 3px solid var(--primary);
+  border-radius: 0 8px 8px 0; padding: 10px 14px; margin: 0;
+}
+.rev-box { max-width: 52rem; }
+.rev-box h2 { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+.rev-box h2 svg { width: 20px; height: 20px; fill: var(--primary); }
+.rev-hero .eyebrow svg { fill: var(--primary); }
+.giscus { margin-top: 6px; }
