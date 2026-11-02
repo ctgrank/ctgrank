@@ -16,6 +16,8 @@ from datetime import date
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.join(HERE, "..")
 SITE = "https://ctgrank.pages.dev"
+# Cloudflare Pages serves this page extensionless and 308-redirects .html
+PAGE_URL = SITE + "/reviews"
 
 
 def slice_block(doc, start, end):
@@ -57,7 +59,7 @@ def main():
 <meta name="copyright" content="Copyright © 2026 Jahin" />
 <meta name="robots" content="index, follow" />
 <meta name="google-site-verification" content="nIIOK8Yis5j2SXAVNeFqBoS3zMTAc1giGRTj1-wq-ag" />
-<link rel="canonical" href="{SITE}/reviews.html" />
+<link rel="canonical" href="{PAGE_URL}" />
 
 <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
 <meta name="theme-color" content="#2563eb" />
@@ -66,7 +68,7 @@ def main():
 <meta property="og:site_name" content="Shikhor" />
 <meta property="og:title" content="Reviews — Shikhor" />
 <meta property="og:description" content="Tell us what works, what's missing, and what Shikhor should fix next." />
-<meta property="og:url" content="{SITE}/reviews.html" />
+<meta property="og:url" content="{PAGE_URL}" />
 <meta property="og:image" content="{SITE}/assets/og-image.png" />
 <meta name="twitter:card" content="summary_large_image" />
 
@@ -74,7 +76,7 @@ def main():
 <link rel="stylesheet" href="assets/styles.css" />
 <script type="application/ld+json">
 {{"@context":"https://schema.org","@type":"WebPage","name":"Reviews — Shikhor",
- "url":"{SITE}/reviews.html","description":"User reviews and feedback for Shikhor, the unofficial Chattogram Board SSC & HSC rank archive.",
+ "url":"{PAGE_URL}","description":"User reviews and feedback for Shikhor, the unofficial Chattogram Board SSC & HSC rank archive.",
  "isPartOf":{{"@type":"WebSite","name":"Shikhor","url":"{SITE}/"}}}}
 </script>
 </head>
@@ -140,7 +142,7 @@ def main():
     sm = os.path.join(ROOT, "sitemap.xml")
     if os.path.exists(sm):
         s = open(sm, encoding="utf-8").read()
-        url = f"{SITE}/reviews.html"
+        url = PAGE_URL
         if url not in s:
             entry = (f"<url><loc>{url}</loc><lastmod>{date.today().isoformat()}"
                      "</lastmod><changefreq>weekly</changefreq>"
