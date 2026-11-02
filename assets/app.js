@@ -500,7 +500,8 @@ function studentCard(i, forPrint) {
   const actions = forPrint ? '' : `<div class="scard-actions">
       <button class="btn btn-ghost" data-act="copy">${icon('copy')} Copy result</button>
       <button class="btn btn-ghost" data-act="link">${icon('link')} Copy link</button>
-      <button class="btn btn-ghost" data-act="print">${icon('print')} Print / PDF</button>
+      <button class="btn btn-ghost" data-act="print">${icon('print')} Print</button>
+      <button class="btn btn-ghost" data-act="download">${icon('download')} Download</button>
       <button class="btn btn-ghost" data-act="school">${icon('school')} This institution</button>
     </div>`;
   return `<div class="scard" data-i="${i}">
@@ -718,6 +719,160 @@ function printStudent(i) {
   if (doc.readyState === 'complete') go(); else frame.onload = go;
   setTimeout(go, 300);
   toast('Opening print dialog…');
+}
+
+/* ─────────────────────── download one result as a PDF ─────────────────── */
+/* The PDF library is ~360 KB, so it is fetched only the first time someone
+   clicks Download — normal page loads never wait on it. */
+let jsPdfPromise = null;
+function loadJsPdf() {
+  if (jsPdfPromise) return jsPdfPromise;
+  jsPdfPromise = new Promise(function (resolve, reject) {
+    if (window.jspdf && window.jspdf.jsPDF) { resolve(window.jspdf.jsPDF); return; }
+    const me = document.querySelector('script[src*="app.js"]');
+    const base = me ? new URL('.', me.src).href : location.href;
+    const s = document.createElement('script');
+    s.src = base + 'vendor/jspdf.umd.min.js';
+    s.onload = function () {
+      if (window.jspdf && window.jspdf.jsPDF) resolve(window.jspdf.jsPDF);
+      else reject(new Error('the PDF library did not start'));
+    };
+    s.onerror = function () { reject(new Error('the PDF library could not be loaded')); };
+    document.head.appendChild(s);
+  });
+  return jsPdfPromise;
+}
+
+/* jsPDF's built-in fonts are WinAnsi. Keep to plain characters so the file
+   looks the same in every PDF viewer, especially older ones. */
+function pdfSafe(s) {
+  return String(s)
+    .replace(/[\u2014\u2013]/g, '-')
+    .replace(/[\u00b7\u2022\u00a0]/g, ' ')
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[\u201c\u201d]/g, '"')
+    .replace(/[^\x20-\x7E]/g, '');
+}
+
+function downloadStudentPdf(i) {
+  const ds = S.ds, m = ds.meta, PIN = 1300;
+  const roll = ds.roll[i], name = ds.name[i];
+  const subs = subjectsOf(i);
+  toast('Preparing PDF…');
+  loadJsPdf().then(function (JsPDF) {
+    const doc = new JsPDF({ unit: 'mm', format: 'a4' });
+    const W = doc.internal.pageSize.getWidth();
+    const H = doc.internal.pageSize.getHeight();
+    const L = 16, RG = W - 16;
+    const BLUE = [37, 99, 235], DARK = [17, 24, 39], MUTED = [91, 104, 117], LINE = [215, 222, 232];
+    let y = 18;
+
+    const room = (need) => { if (y + need > H - 18) { doc.addPage(); y = 18; } };
+    const ink = (c) => doc.setTextColor(c[0], c[1], c[2]);
+
+    // ── header
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(17); ink(BLUE);
+    doc.text('Shikhor', L, y);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); ink(MUTED);
+    doc.text(pdfSafe(m.exam + ' ' + m.year + ' - ' + m.group), RG, y, { align: 'right' });
+    doc.text('Chattogram Board - unofficial rank archive', RG, y + 4.5, { align: 'right' });
+    y += 8;
+    doc.setDrawColor(BLUE[0], BLUE[1], BLUE[2]); doc.setLineWidth(0.7);
+    doc.line(L, y, RG, y);
+    y += 10;
+
+    // ── who
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(15); ink(DARK);
+    doc.text(pdfSafe(name), L, y); y += 6.5;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(10.5); ink(MUTED);
+    doc.text(pdfSafe('Roll ' + roll + '   ' + m.exam + ' ' + m.year + '   ' + m.group), L, y); y += 5.5;
+    const inst = doc.splitTextToSize(pdfSafe(ds.schools[ds.sid[i]]), RG - L);
+    doc.text(inst, L, y); y += 4.6 * inst.length + 4;
+
+    // ── summary boxes
+    const pct = (subs && ds.total[i] >= 0)
+      ? Math.min(100, Math.round(ds.total[i] / PIN * 100)) : null;
+    const kpis = [
+      [String(i + 1), 'Board rank'],
+      [gpaTxt(ds.gpa[i]), 'GPA'],
+      [ds.total[i] < 0 ? '-' : String(ds.total[i]), 'Total marks'],
+      [pct == null ? '-' : pct + '%', pct == null ? 'Marks %' : 'Of ' + PIN]
+    ];
+    const gap = 3, bw = (RG - L - gap * 3) / 4, bh = 15;
+    room(bh + 4);
+    kpis.forEach(function (k, n) {
+      const x = L + n * (bw + gap);
+      doc.setDrawColor(LINE[0], LINE[1], LINE[2]); doc.setLineWidth(0.3);
+      doc.setFillColor(248, 250, 252); doc.roundedRect(x, y, bw, bh, 2, 2, 'FD');
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(12); ink(DARK);
+      doc.text(k[0], x + bw / 2, y + 8, { align: 'center' });
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); ink(MUTED);
+      doc.text(k[1], x + bw / 2, y + 12.5, { align: 'center' });
+    });
+    y += bh + 9;
+
+    // ── subject-wise marks
+    if (subs) {
+      room(14);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(11); ink(DARK);
+      doc.text('Subject-wise marks', L, y); y += 6;
+      m.subjects.forEach(function (d, k) {
+        const v = subs[k];
+        if (v === NO_MARK) return;             // not sat by this student
+        room(9);
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(10); ink(DARK);
+        doc.text(pdfSafe(d.name), L, y);
+        doc.setFont('helvetica', 'bold');
+        doc.text(v + ' / ' + d.full, RG, y, { align: 'right' });
+        const p = Math.min(100, Math.round(v / d.full * 100));
+        const bwid = 44, bx = RG - bwid - 24, by = y + 1.4;
+        const c = p >= 80 ? [22, 163, 74] : p < 33 ? [220, 38, 38] : BLUE;
+        doc.setFillColor(226, 232, 240); doc.rect(bx, by, bwid, 1.8, 'F');
+        doc.setFillColor(c[0], c[1], c[2]); doc.rect(bx, by, bwid * p / 100, 1.8, 'F');
+        doc.setDrawColor(226, 232, 240); doc.setLineWidth(0.2); doc.line(L, y + 4.4, RG, y + 4.4);
+        y += 8.4;
+      });
+      y += 3;
+    }
+
+    // ── PCM merit
+    const pm = pcmMeritOf(ds, i);
+    if (pm) {
+      room(21);
+      doc.setFillColor(239, 246, 255); doc.setDrawColor(191, 219, 254); doc.setLineWidth(0.3);
+      doc.roundedRect(L, y, RG - L, 17, 2, 2, 'FD');
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); ink(BLUE);
+      doc.text('PCM MERIT', L + 4, y + 5.2);
+      doc.setFontSize(13); ink(DARK);
+      doc.text('#' + nf(pm.rank), L + 4, y + 12.4);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(9); ink(MUTED);
+      doc.text('of ' + nf(pm.of) + ' who sat all three', L + 22, y + 12.4);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(10); ink(DARK);
+      doc.text(pm.marks + ' marks', RG - 4, y + 12.4, { align: 'right' });
+      y += 22;
+    }
+
+    // ── footnotes
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(8); ink(MUTED);
+    [
+      'Board rank ' + nf(i + 1) + ' of ' + nf(m.count) + ' ' + m.exam + ' ' + m.year + ' ' +
+        m.group + ' students, ordered by GPA then total marks.',
+      'Unofficial - verify against your official marksheet or the board result portal. ' +
+        'Shikhor (c) ' + new Date().getFullYear() + ' Jahin.',
+      'Downloaded from ctgrank.pages.dev on ' + new Date().toLocaleDateString('en-GB')
+    ].forEach(function (t) {
+      const lines = doc.splitTextToSize(pdfSafe(t), RG - L);
+      room(lines.length * 4.4);
+      doc.text(lines, L, y);
+      y += lines.length * 4.4 + 1.2;
+    });
+
+    doc.save('Shikhor-' + m.exam + '-' + m.year + '-' +
+      String(m.group).replace(/\s+/g, '') + '-roll' + roll + '.pdf');
+    toast('PDF downloaded');
+  }).catch(function (err) {
+    toast('Download failed - ' + ((err && err.message) || 'please try again'), false);
+  });
 }
 
 /* ─────────────────────────────── URL state ─────────────────────────── */
@@ -970,6 +1125,7 @@ function wire() {
       catch { toast(url, false); }
     }
     if (b.dataset.act === 'print') printStudent(i);
+    if (b.dataset.act === 'download') downloadStudentPdf(i);
     if (b.dataset.act === 'school') {
       $('#schoolFilter').value = ds.sid[i]; S.school = String(ds.sid[i]);
       closeModal(); applyFilters(); setView('students');
