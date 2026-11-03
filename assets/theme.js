@@ -17,7 +17,7 @@
     var lbl = document.querySelector('.theme-label');
     if (lbl) lbl.textContent = dark ? 'Light' : 'Dark';
     var m = document.querySelector('meta[name="theme-color"]');
-    if (m) m.setAttribute('content', dark ? '#0b1120' : '#2563eb');
+    if (m) m.setAttribute('content', dark ? '#0f1130' : '#533afd');
   }
 
   var saved = null;

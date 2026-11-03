@@ -67,7 +67,7 @@ def main():
 <link rel="canonical" href="{PAGE_URL}" />
 
 <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
-<meta name="theme-color" content="#2563eb" />
+<meta name="theme-color" content="#533afd" />
 
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Shikhor" />
@@ -77,6 +77,9 @@ def main():
 <meta property="og:image" content="{SITE}/assets/og-image.png" />
 <meta name="twitter:card" content="summary_large_image" />
 
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" />
 <link rel="preload" href="assets/styles.css" as="style" />
 <link rel="stylesheet" href="assets/styles.css" />
 <script type="application/ld+json">

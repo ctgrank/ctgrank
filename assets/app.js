@@ -31,6 +31,27 @@ const S = {
 const nf = n => (n == null ? '—' : n.toLocaleString('en-US'));
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const icon = id => `<svg><use href="#i-${id}"/></svg>`;
+
+/* Explicit pending state for async action buttons — an action must never
+   look idle while it is working. */
+function setBusy(btn, busy) {
+  if (!btn) return;
+  let sp = btn.querySelector && btn.querySelector('.btn-spinner');
+  if (busy) {
+    btn.disabled = true;
+    btn.setAttribute('aria-busy', 'true');
+    if (!sp) {
+      sp = document.createElement('span');
+      sp.className = 'btn-spinner';
+      sp.setAttribute('aria-hidden', 'true');
+      btn.insertBefore(sp, btn.firstChild);
+    }
+  } else {
+    btn.disabled = false;
+    btn.removeAttribute('aria-busy');
+    if (sp) sp.remove();
+  }
+}
 const gpaTxt = v => (v < 0 ? '—' : (v / 100).toFixed(2));
 
 function b64ToBytes(b64) {
@@ -67,7 +88,7 @@ function setTheme(dark) {
   document.documentElement.dataset.theme = dark ? 'dark' : 'light';
   $('.theme-label').textContent = dark ? 'Light' : 'Dark';
   const m = $('meta[name="theme-color"]');
-  if (m) m.setAttribute('content', dark ? '#0b1120' : '#2563eb');
+  if (m) m.setAttribute('content', dark ? '#0f1130' : '#533afd');
 }
 
 /* ─────────────────────────────── catalog ───────────────────────────── */
@@ -650,7 +671,7 @@ function renderCompare() {
    all — so the card is rendered into a hidden iframe holding only this
    result, and the dialog is opened from there. The live page is never
    touched, so nothing leaks into an ordinary Ctrl+P. */
-function printStudent(i) {
+function printStudent(i, btn) {
   const ds = S.ds;
   const frame = document.createElement('iframe');
   frame.setAttribute('aria-hidden', 'true');
@@ -715,9 +736,11 @@ function printStudent(i) {
     if (opened) return;
     opened = true;
     try { w.focus(); w.print(); } catch (e) { cleanup(); }
+    setBusy(btn, false);
   };
   if (doc.readyState === 'complete') go(); else frame.onload = go;
   setTimeout(go, 300);
+  setBusy(btn, true);
   toast('Opening print dialog…');
 }
 
@@ -754,10 +777,11 @@ function pdfSafe(s) {
     .replace(/[^\x20-\x7E]/g, '');
 }
 
-function downloadStudentPdf(i) {
+function downloadStudentPdf(i, btn) {
   const ds = S.ds, m = ds.meta, PIN = 1300;
   const roll = ds.roll[i], name = ds.name[i];
   const subs = subjectsOf(i);
+  setBusy(btn, true);
   toast('Preparing PDF…');
   loadJsPdf().then(function (JsPDF) {
     const doc = new JsPDF({ unit: 'mm', format: 'a4' });
@@ -869,8 +893,10 @@ function downloadStudentPdf(i) {
 
     doc.save('Shikhor-' + m.exam + '-' + m.year + '-' +
       String(m.group).replace(/\s+/g, '') + '-roll' + roll + '.pdf');
+    setBusy(btn, false);
     toast('PDF downloaded');
   }).catch(function (err) {
+    setBusy(btn, false);
     toast('Download failed - ' + ((err && err.message) || 'please try again'), false);
   });
 }
@@ -1124,8 +1150,8 @@ function wire() {
       try { await navigator.clipboard.writeText(url); toast('Link copied'); }
       catch { toast(url, false); }
     }
-    if (b.dataset.act === 'print') printStudent(i);
-    if (b.dataset.act === 'download') downloadStudentPdf(i);
+    if (b.dataset.act === 'print') printStudent(i, b);
+    if (b.dataset.act === 'download') downloadStudentPdf(i, b);
     if (b.dataset.act === 'school') {
       $('#schoolFilter').value = ds.sid[i]; S.school = String(ds.sid[i]);
       closeModal(); applyFilters(); setView('students');
