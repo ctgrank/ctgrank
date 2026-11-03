@@ -287,8 +287,16 @@ def inject_index_links(metas):
         if exam not in exams:
             continue
         items = "".join(
-            # relative, so the same HTML works on Surge, GitHub Pages and a sub-path
-            '<li><a href="%s/">%s %d %s</a> <span>%s students · %d %s</span></li>'
+            # relative, so the same HTML works on Surge, GitHub Pages and a
+            # sub-path. The exam name stays in the anchor text for crawlers
+            # (sr-only) even though the card only shows year + group.
+            '<li><a href="%s/">'
+            '<span class="sr-only">%s </span>'
+            '<span class="d-year">%d</span>'
+            '<span class="d-group">%s</span>'
+            '<span class="d-meta">%s students &middot; %d %s</span>'
+            '<svg class="d-go"><use href="#i-arrow"/></svg>'
+            '</a></li>'
             % (slug(m), m["exam"], m["year"], m["group"], f'{m["count"]:,}',
                m["schools"], "colleges" if exam == "HSC" else "schools")
             for m in sorted(exams[exam], key=lambda x: (-x["year"], x["group"])))
