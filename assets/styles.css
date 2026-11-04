@@ -686,3 +686,172 @@ mark { background: color-mix(in srgb, var(--accent) 40%, transparent); color: in
 }
 .rev-del:hover { background: #dc2626; color: #fff; border-color: #dc2626; }
 .rev-del:disabled { opacity: .5; cursor: default; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Tasks & Habits  (tasks.html)
+   Personal planner kept entirely in localStorage — no account, no server.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.tk-note { display:flex; gap:10px; align-items:flex-start; background:var(--primary-l);
+  border:1px solid color-mix(in srgb, var(--primary) 18%, transparent);
+  border-radius:var(--r-sm); padding:11px 14px; font-size:13.5px; line-height:1.55;
+  color:var(--text-2); margin:0 0 18px; }
+.tk-note svg { width:17px; height:17px; flex:none; color:var(--primary); margin-top:1px; }
+.tk-note b { color:var(--text); font-weight:600; }
+
+/* ── section head ─────────────────────────────────────────────────────── */
+.tk-head { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
+.tk-head h2 { display:flex; align-items:center; gap:9px; margin:0; font-size:20px;
+  font-weight:300; letter-spacing:-.2px; color:var(--text); }
+.tk-head h2 svg { width:19px; height:19px; color:var(--primary); flex:none; }
+.tk-head .seg { margin-left:auto; }
+
+.tk-count { font-size:13px; font-weight:600; color:var(--muted); font-variant-numeric:tabular-nums; }
+
+/* ── progress ─────────────────────────────────────────────────────────── */
+.tk-prog { height:6px; background:var(--surface-2); border-radius:999px; overflow:hidden;
+  margin:0 0 14px; border:1px solid var(--border); }
+.tk-prog i { display:block; height:100%; width:0; border-radius:999px;
+  background:var(--primary); transition:width .28s ease; }
+
+/* ── add row ──────────────────────────────────────────────────────────── */
+.tk-add { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+.tk-add .tk-input { flex:1 1 240px; min-width:0; }
+.tk-input { width:100%; padding:10px 13px; font:inherit; font-size:15px;
+  border:1px solid var(--border-input); border-radius:var(--r-sm);
+  background:var(--surface); color:var(--text); transition:border-color .14s, box-shadow .14s; }
+.tk-input::placeholder { color:var(--muted); }
+.tk-input:focus { outline:none; border-color:var(--primary);
+  box-shadow:0 0 0 3px color-mix(in srgb, var(--primary) 16%, transparent); }
+
+/* ── task list ────────────────────────────────────────────────────────── */
+.tk-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
+.tk-item { display:flex; align-items:flex-start; gap:11px; padding:11px 12px;
+  background:var(--surface-2); border:1px solid var(--border);
+  border-radius:var(--r-sm); transition:border-color .14s, background .14s; }
+.tk-item:hover { border-color:color-mix(in srgb, var(--primary) 34%, var(--border)); }
+.tk-item.is-done { background:var(--surface); }
+.tk-item.is-done .tk-text { text-decoration:line-through; color:var(--muted); }
+
+/* checkbox — real input, restyled. Kept large enough to tap (WCAG 2.5.8). */
+.tk-check { appearance:none; -webkit-appearance:none; flex:none;
+  width:26px; height:26px; margin:0; border:2px solid var(--border-input);
+  border-radius:8px; background:var(--surface); cursor:pointer;
+  display:grid; place-content:center; transition:.14s; }
+.tk-check::after { content:""; width:12px; height:12px; transform:scale(.4); opacity:0;
+  transition:.14s; background:currentColor; color:#fff;
+  clip-path:polygon(14% 47%, 0 61%, 40% 100%, 100% 22%, 86% 8%, 38% 71%); }
+.tk-check:hover { border-color:var(--primary); }
+.tk-check:focus-visible { outline:2px solid var(--primary); outline-offset:2px; }
+.tk-check:checked { background:var(--primary); border-color:var(--primary); }
+.tk-check:checked::after { transform:scale(1); opacity:1; }
+
+.tk-body { flex:1 1 auto; min-width:0; }
+.tk-text { display:block; font-size:15px; line-height:1.45; color:var(--text);
+  overflow-wrap:anywhere; }
+.tk-meta { display:flex; gap:7px; align-items:center; flex-wrap:wrap; margin-top:3px; }
+.tk-carried { font-size:11px; font-weight:700; letter-spacing:.02em;
+  color:var(--muted); background:var(--surface); border:1px solid var(--border);
+  padding:2px 7px; border-radius:999px; }
+
+.tk-del { flex:none; width:32px; height:32px; display:grid; place-content:center;
+  border:1px solid transparent; background:none; border-radius:8px;
+  color:var(--muted); cursor:pointer; transition:.14s; }
+.tk-del svg { width:16px; height:16px; }
+.tk-del:hover { color:#b91c1c; background:color-mix(in srgb, #dc2626 9%, transparent);
+  border-color:color-mix(in srgb, #dc2626 30%, transparent); }
+.tk-del:focus-visible { outline:2px solid var(--primary); outline-offset:1px; }
+
+.tk-empty { text-align:center; padding:30px 18px; color:var(--muted); font-size:14.5px;
+  border:1px dashed var(--border); border-radius:var(--r-sm); background:var(--surface-2); }
+
+/* ── habits ───────────────────────────────────────────────────────────── */
+.tk-habit { display:flex; gap:14px; align-items:flex-start; padding:15px 16px;
+  background:var(--surface-2); border:1px solid var(--border);
+  border-radius:var(--r-sm); margin-bottom:9px; transition:border-color .14s; }
+.tk-habit:hover { border-color:color-mix(in srgb, var(--primary) 30%, var(--border)); }
+.tk-habit.is-done { background:var(--primary-l);
+  border-color:color-mix(in srgb, var(--primary) 28%, transparent); }
+
+.tk-habit-main { flex:1 1 auto; min-width:0; }
+.tk-habit-name { font-size:16px; font-weight:600; color:var(--text);
+  overflow-wrap:anywhere; }
+.tk-stats { display:flex; gap:7px; flex-wrap:wrap; margin-top:7px; }
+.tk-stat { display:inline-flex; align-items:center; gap:5px; font-size:12px;
+  font-weight:700; padding:3px 9px; border-radius:999px;
+  font-variant-numeric:tabular-nums; background:var(--surface);
+  border:1px solid var(--border); color:var(--text-2); }
+.tk-stat svg { width:13px; height:13px; }
+.tk-stat.is-streak { color:#b45309; background:#fffbeb;
+  border-color:color-mix(in srgb, #f59e0b 40%, transparent); }
+.tk-stat.is-today { color:var(--primary-d); background:var(--surface);
+  border-color:color-mix(in srgb, var(--primary) 30%, transparent); }
+.tk-stat.is-missed { color:#b91c1c; background:#fef2f2;
+  border-color:color-mix(in srgb, #dc2626 32%, transparent); }
+
+/* 7-day strip */
+.tk-week { display:flex; gap:5px; margin-top:10px; }
+.tk-day { width:22px; height:22px; border-radius:6px; display:grid; place-content:center;
+  font-size:10px; font-weight:700; color:var(--muted);
+  background:var(--surface); border:1px solid var(--border);
+  font-variant-numeric:tabular-nums; }
+.tk-day.on { background:var(--primary); border-color:var(--primary); color:#fff; }
+.tk-day.today { outline:2px solid color-mix(in srgb, var(--primary) 45%, transparent);
+  outline-offset:1px; }
+.tk-day.future { opacity:.4; }
+
+.tk-habit-side { display:flex; flex-direction:column; gap:7px; align-items:center; flex:none; }
+.tk-mark { min-width:92px; display:inline-flex; align-items:center; justify-content:center;
+  gap:7px; padding:9px 14px; border-radius:var(--r-pill); font-size:13.5px;
+  font-weight:600; cursor:pointer; border:1px solid var(--border-input);
+  background:var(--surface); color:var(--text-2); transition:.14s; }
+.tk-mark svg { width:15px; height:15px; }
+.tk-mark:hover { border-color:var(--primary); color:var(--primary); }
+.tk-mark:focus-visible { outline:2px solid var(--primary); outline-offset:2px; }
+.tk-mark.is-on { background:var(--primary); border-color:var(--primary); color:#fff; }
+.tk-mark.is-on:hover { background:var(--primary-d); color:#fff; }
+
+/* ── danger / reset ───────────────────────────────────────────────────── */
+.tk-foot { display:flex; align-items:center; justify-content:space-between;
+  gap:12px; flex-wrap:wrap; margin-top:6px; }
+.tk-reset { font-size:13px; font-weight:600; color:var(--muted);
+  background:none; border:1px solid var(--border); border-radius:var(--r-pill);
+  padding:8px 15px; cursor:pointer; transition:.14s; }
+.tk-reset:hover { color:#b91c1c; border-color:color-mix(in srgb, #dc2626 40%, transparent); }
+
+/* ── mobile: bigger tap targets ───────────────────────────────────────── */
+@media (max-width: 640px) {
+  .tk-check { width:40px; height:40px; border-radius:10px; }
+  .tk-check::after { width:17px; height:17px; }
+  .tk-del { width:40px; height:40px; }
+  .tk-del svg { width:18px; height:18px; }
+  .tk-mark { min-width:104px; padding:11px 16px; }
+  .tk-day { width:26px; height:26px; font-size:11px; }
+  .tk-head .seg { margin-left:0; width:100%; }
+  .tk-head .seg-btn { flex:1 1 auto; justify-content:center; }
+  .tk-add .btn { flex:1 1 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tk-prog i, .tk-check, .tk-check::after { transition:none; }
+}
+
+.tk-status { min-height:19px; margin:2px 0 0; font-size:13.5px; font-weight:600;
+  color:var(--primary-d); }
+.tk-status:empty { min-height:0; }
+.tk-status.is-err { color:#b91c1c; }
+
+/* ── dark: keep the coloured chips at home on the navy canvas ─────────── */
+[data-theme="dark"] .tk-stat.is-streak {
+  background:color-mix(in srgb, #f59e0b 16%, transparent);
+  color:#fbbf24; border-color:color-mix(in srgb, #f59e0b 34%, transparent); }
+[data-theme="dark"] .tk-stat.is-missed {
+  background:color-mix(in srgb, #f87171 14%, transparent);
+  color:#fca5a5; border-color:color-mix(in srgb, #f87171 32%, transparent); }
+[data-theme="dark"] .tk-note {
+  background:color-mix(in srgb, var(--primary) 14%, transparent);
+  border-color:color-mix(in srgb, var(--primary) 30%, transparent); }
+[data-theme="dark"] .tk-del:hover {
+  color:#fca5a5; background:color-mix(in srgb, #dc2626 20%, transparent);
+  border-color:color-mix(in srgb, #dc2626 40%, transparent); }
+[data-theme="dark"] .tk-day.on { background:var(--primary-soft); border-color:var(--primary-soft); }

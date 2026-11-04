@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tasks &amp; Habits — Shikhor</title>
+<meta name="description" content="A free daily planner for students: add today's tasks, line up tomorrow's, and track habits with a day counter and streak. No sign-up, nothing leaves your browser." />
+<meta name="author" content="Jahin" />
+<meta name="copyright" content="Copyright © 2026 Jahin" />
+<meta name="robots" content="index, follow" />
+<meta name="google-site-verification" content="nIIOK8Yis5j2SXAVNeFqBoS3zMTAc1giGRTj1-wq-ag" />
+<link rel="canonical" href="https://ctgrank.pages.dev/tasks" />
+
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
+<meta name="theme-color" content="#533afd" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Shikhor" />
+<meta property="og:title" content="Tasks &amp; Habits — Shikhor" />
+<meta property="og:description" content="Plan today, line up tomorrow, and keep a habit going. Free, private, and no sign-up." />
+<meta property="og:url" content="https://ctgrank.pages.dev/tasks" />
+<meta property="og:image" content="https://ctgrank.pages.dev/assets/og-image.png" />
+<meta name="twitter:card" content="summary_large_image" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" />
+<link rel="preload" href="assets/styles.css" as="style" />
+<link rel="stylesheet" href="assets/styles.css" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","name":"Tasks & Habits — Shikhor",
+ "url":"https://ctgrank.pages.dev/tasks","description":"A free daily task and habit tracker for students that keeps everything in the browser.",
+ "isPartOf":{"@type":"WebSite","name":"Shikhor","url":"https://ctgrank.pages.dev/"}}
+</script>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="i-peak" viewBox="0 0 24 24">
+    <circle cx="6.4" cy="6.2" r="2.5"/>
+    <path d="M13.2 3.6 22.4 20.4H1.6L13.2 3.6Zm0 5-3.2 6h6.4l-3.2-6Z"/>
+  </symbol>
+  <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M18 4V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v1H3v3a4 4 0 0 0 3.2 3.9A6 6 0 0 0 11 14.9V18H8v2h8v-2h-3v-3.1a6 6 0 0 0 4.8-4A4 4 0 0 0 21 7V4h-3ZM5 7V5h1v2.6A2 2 0 0 1 5 7Zm14 0a2 2 0 0 1-1 1.6V5h1v2Z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><path d="M10 2a8 8 0 1 0 4.9 14.32l5.39 5.39 1.42-1.42-5.39-5.39A8 8 0 0 0 10 2Zm0 2a6 6 0 1 1 0 12 6 6 0 0 1 0-12Z"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><path d="M10.6 13.4a1 1 0 0 1 0-1.42l1.38-1.38a1 1 0 0 1 1.42 1.42l-1.38 1.37a1 1 0 0 1-1.42 0Zm-3.5-3.5a4 4 0 0 1 5.66-5.66l1.72 1.72-1.42 1.41-1.72-1.71a2 2 0 0 0-2.82 2.82l1.71 1.72-1.41 1.42-1.72-1.72Zm9.9 4.2-1.72 1.72a2 2 0 0 1-2.82-2.83l1.71-1.71-1.41-1.42-1.72 1.72a4 4 0 0 0 5.66 5.66l1.72-1.72-1.42-1.42Z"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><path d="M7 4V2h12v14h-2V4H7ZM4 6h11v16H4V6Zm2 2v12h7V8H6Z"/></symbol>
+  <symbol id="i-print" viewBox="0 0 24 24"><path d="M7 3h10v4h4v7h-3v5H6v-5H3V7h4V3Zm2 2v2h6V5H9ZM5 9v3h14V9H5Zm3 7h8v-3H8v3Z"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h12.17l-3.59-3.59L15 7l6 6-6 6-1.41-1.41L17.17 14H5v-2Z"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2ZM19 9h-4V3H9v6H5l7 7 7-7Z"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><path d="M12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10Zm0-2a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM11 1h2v3h-2V1Zm0 19h2v3h-2v-3ZM1 11h3v2H1v-2Zm19 0h3v2h-3v-2ZM3.5 5.6l1.4-1.4 2.1 2.1-1.4 1.5-2.1-2.2Zm15.4 12.7 1.5-1.4 2.1 2.1-1.4 1.4-2.2-2.1Zm2.1-12.7-2.1 2.1-1.4-1.4 2.1-2.1 1.4 1.4ZM4.9 18.3l2.1-2.1 1.4 1.4-2.1 2.1-1.4-1.4Z"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M12.3 2a9 9 0 1 0 9.7 12.7A7.5 7.5 0 0 1 12.3 2Z"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M18.3 5.7 12 12l6.3 6.3-1.4 1.4L10.6 13.4 12 12 5.7 18.3l-1.4-1.4L10.6 12 4.3 5.7l1.4-1.4L12 10.6l6.3-6.3 1.4 1.4Z"/></symbol>
+  <symbol id="i-school" viewBox="0 0 24 24"><path d="M12 2 2 7v2h20V7L12 2ZM4 11v7h3v-7H4Zm6 0v7h3v-7h-3Zm6 0v7h3v-7h-3ZM2 20v2h20v-2H2Z"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 2c-3.3 0-6 1.8-6 4v3h12v-3c0-2.2-2.7-4-6-4Zm8.5-2a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm.5 2c-.7 0-1.4.1-2 .3 1.2.9 2 2.1 2 3.7v3h6v-3c0-2.2-2.7-4-6-4Z"/></symbol>
+  <symbol id="i-compare" viewBox="0 0 24 24"><path d="M11 3h2v18h-2V3Zm-7 3 5 4-5 4V3h0ZM20 6v8l-5-4 5-4Z"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm1 15h-2v-6h2v6Zm0-8h-2V7h2v2Z"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="m12 5 7 7-1.4 1.4L13 8.8V20h-2V8.8l-4.6 4.6L5 12l7-7Z"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M3 5h18v2H3V5Zm0 6h18v2H3v-2Zm0 6h18v2H3v-2Z"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><path d="M18 16.1a3 3 0 0 0-2 .8l-7.1-4.1a3 3 0 0 0 0-1.6L16 7.1a3 3 0 1 0-1-2.1v.4L7.9 9.5a3 3 0 1 0 0 5l7.1 4.1v.4a3 3 0 1 0 3-3Z"/></symbol>
+  <symbol id="i-filter" viewBox="0 0 24 24"><path d="M3 5h18v2l-7 7v6l-4 2v-8L3 7V5Z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M9.6 16.2 5.4 12l-1.4 1.4 5.6 5.6L20.4 7.6 19 6.2 9.6 16.2Z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6V5Z"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M10 3h4l1 2h4a1 1 0 0 1 1 1v1H4V6a1 1 0 0 1 1-1h4l1-2Zm-3 6h10l-.9 12.1a1 1 0 0 1-1 .9H8.9a1 1 0 0 1-1-.9L7 9Z"/></symbol>
+  <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 22c3.9 0 7-3 7-6.6C19 11 14.6 9.2 14 4.6c-.1-.6-.1-1.1 0-1.6C11.7 4.2 10.1 6.2 9.7 8.6c-.2 1-1 1.5-1.7 1.1-.5-.3-.8-.9-.8-1.6C5.6 9.4 5 10.9 5 12.4 5 17.8 8.1 22 12 22Z"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 2 3 6.6 7 .8-5.2 4.8 1.4 7-6.2-3.6L5.8 21l1.4-7L2 9.4l7-.8L12 2Z"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3Zm0 2.1 6 2.3V11c0 4-2.6 7.5-6 8.9C8.6 18.5 6 15 6 11V6.4l6-2.3Zm-1 10.9h2v2h-2v-2Zm0-7h2v5h-2V8Z"/></symbol>
+</defs></svg>
+<header class="nav" id="nav">
+  <div class="nav-inner">
+    <a class="brand" href="index.html" aria-label="Shikhor — home">
+      <svg class="brand-mark"><use href="#i-peak"/></svg>
+      <span class="brand-word">Shikhor<span class="brand-tag">Board Rank</span></span>
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+      <svg><use href="#i-menu"/></svg>
+    </button>
+    <nav class="nav-links" id="navLinks" aria-label="Main">
+      <a href="index.html"><svg><use href="#i-trophy"/></svg> Rankings</a>
+      <a href="index.html#schoolsView" data-goto="schools"><svg><use href="#i-school"/></svg> <span id="navSchoolsLbl">Top Schools</span></a>
+      <a href="index.html#compareView" data-goto="compare"><svg><use href="#i-compare"/></svg> Compare</a>
+      <a href="index.html#about"><svg><use href="#i-info"/></svg> About</a>
+      <a href="reviews.html"><svg><use href="#i-star"/></svg> Reviews</a>
+      <a href="tasks.html" class="active" aria-current="page"><svg><use href="#i-check"/></svg> Tasks</a>
+      <button class="linklike" id="themeBtn" aria-label="Toggle dark mode">
+        <svg class="ico-light"><use href="#i-moon"/></svg>
+        <svg class="ico-dark"><use href="#i-sun"/></svg>
+        <span class="theme-label">Dark</span>
+      </button>
+      <button class="linklike" id="shareBtn"><svg><use href="#i-share"/></svg> Share</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero tk-hero">
+    <p class="eyebrow"><svg class="ico"><use href="#i-check"/></svg> Tasks &amp; Habits</p>
+    <h1>Plan today. <span>Keep it going.</span></h1>
+    <p class="lede">A plain daily planner for students. Add what today needs,
+       line up tomorrow while you think of it, and tick off one habit a day
+       to watch the run build.</p>
+  </section>
+
+  <div class="wrap">
+    <p class="tk-note">
+      <svg><use href="#i-shield"/></svg>
+      <span><b>This stays on your device.</b> Tasks and habits are saved in
+      this browser only — there is no account and nothing is uploaded, so
+      they won't follow you to another phone or survive a cleared browsing
+      history.</span>
+    </p>
+
+    <!-- ══════════════════ tasks ══════════════════ -->
+    <section class="card">
+      <div class="tk-head">
+        <h2><svg><use href="#i-check"/></svg> To-do</h2>
+        <span class="tk-count" id="tkCount">nothing here yet</span>
+        <div class="seg seg-sm" role="tablist" aria-label="Which day">
+          <button class="seg-btn is-on" id="tkTabToday" role="tab" aria-selected="true">
+            <svg><use href="#i-sun"/></svg> Today</button>
+          <button class="seg-btn" id="tkTabTomorrow" role="tab" aria-selected="false">
+            <svg><use href="#i-up"/></svg> Tomorrow</button>
+        </div>
+      </div>
+
+      <p class="hint" id="tkWhen" style="margin-bottom:12px"></p>
+
+      <div class="tk-prog" id="tkProg" role="progressbar" aria-label="Tasks completed"
+           aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <i id="tkProgFill"></i>
+      </div>
+
+      <div class="tk-add">
+        <input class="tk-input" id="tkInput" type="text" maxlength="200"
+               autocomplete="off" aria-label="New task"
+               placeholder="What do you need to do today?" />
+        <button class="btn btn-primary" id="tkAddBtn" type="button">
+          <svg><use href="#i-plus"/></svg> Add to today</button>
+      </div>
+
+      <ul class="tk-list" id="tkList"></ul>
+      <p class="tk-status" id="tkStatus" role="status" aria-live="polite"></p>
+      <p class="hint">Anything left unticked rolls over to the next day, so
+         you don't lose it. Finished tasks clear once the day ends.</p>
+    </section>
+
+    <!-- ══════════════════ habits ══════════════════ -->
+    <section class="card">
+      <div class="tk-head">
+        <h2><svg><use href="#i-flame"/></svg> Habits</h2>
+        <span class="tk-count">one tick a day</span>
+      </div>
+
+      <div class="tk-add">
+        <input class="tk-input" id="tkHabitInput" type="text" maxlength="60"
+               autocomplete="off" aria-label="New habit"
+               placeholder="Start a habit — e.g. revise physics for 30 minutes" />
+        <button class="btn btn-primary" id="tkHabitBtn" type="button">
+          <svg><use href="#i-plus"/></svg> Start habit</button>
+      </div>
+
+      <div id="tkHabits"></div>
+      <p class="hint">Each habit counts the days since you began and the
+         current run of days you've kept it. Tap <b>Tick today</b> once a day.</p>
+    </section>
+
+    <div class="tk-foot">
+      <button class="tk-reset" id="tkReset" type="button">Clear everything</button>
+      <span class="hint" style="margin:0">Saved in this browser · nothing is uploaded</span>
+    </div>
+  </div>
+</main>
+
+<footer class="foot">
+  <div>© <span id="year">2026</span> <b>Jahin</b> — <b>Shikhor</b>, an unofficial Chattogram Board rank archive.
+    All rights reserved.</div>
+  <div class="foot-links">
+    <a href="index.html#picker">Rankings</a><a href="index.html#about">About</a>
+    <button class="linklike" id="topBtn"><svg><use href="#i-up"/></svg> Top</button>
+  </div>
+</footer>
+<script src="assets/theme.js"></script>
+<script src="assets/tasks.js"></script>
+</body>
+</html>

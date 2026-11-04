@@ -201,6 +201,21 @@ Result data is aggregated from publicly published Chattogram Education Board res
 This project is an independent, non-commercial study tool. If you are (or represent) a student in
 these lists and would like a record removed, please open an issue.
 
+## ✅ Tasks & Habits (`/tasks`)
+
+A small daily planner for students, built into the site:
+
+- **To-do** — add today's work, or line it up for tomorrow from the
+  *Tomorrow* tab. Tick items off; anything left undone rolls over to the
+  next day instead of vanishing, and finished work clears once the day ends.
+- **Habits** — start a habit and tick it once a day. Each one counts the
+  days since you began and your current run, with a 7-day strip.
+
+Everything is stored in the visitor's own browser (`localStorage`, key
+`shikhor-tasks-v1`). There is no account, no sign-up and nothing is uploaded,
+so lists stay on the device they were written on. Regenerate the page with
+`python3 tools/build_tasks.py` after changing `index.html`'s shell.
+
 ## © Copyright
 
 Copyright © 2026 **Jahin**. All rights reserved.
