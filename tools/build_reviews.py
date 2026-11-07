@@ -58,7 +58,7 @@ def main():
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Reviews — Shikhor, Chattogram Board Rank Lists</title>
+<title>Reviews — Chittagong Board Rank</title>
 <meta name="description" content="Reviews and feedback for Shikhor, the unofficial SSC &amp; HSC rank archive for the Chattogram Education Board. Tell us what works, what's missing, and what to fix next." />
 <meta name="author" content="Jahin" />
 <meta name="copyright" content="Copyright © 2026 Jahin" />
@@ -70,8 +70,8 @@ def main():
 <meta name="theme-color" content="#533afd" />
 
 <meta property="og:type" content="website" />
-<meta property="og:site_name" content="Shikhor" />
-<meta property="og:title" content="Reviews — Shikhor" />
+<meta property="og:site_name" content="Chittagong Board Rank" />
+<meta property="og:title" content="Reviews — Chittagong Board Rank" />
 <meta property="og:description" content="Tell us what works, what's missing, and what Shikhor should fix next." />
 <meta property="og:url" content="{PAGE_URL}" />
 <meta property="og:image" content="{SITE}/assets/og-image.png" />
@@ -83,9 +83,9 @@ def main():
 <link rel="preload" href="assets/styles.css" as="style" />
 <link rel="stylesheet" href="assets/styles.css" />
 <script type="application/ld+json">
-{{"@context":"https://schema.org","@type":"WebPage","name":"Reviews — Shikhor",
+{{"@context":"https://schema.org","@type":"WebPage","name":"Reviews — Chittagong Board Rank",
  "url":"{PAGE_URL}","description":"User reviews and feedback for Shikhor, the unofficial Chattogram Board SSC & HSC rank archive.",
- "isPartOf":{{"@type":"WebSite","name":"Shikhor","url":"{SITE}/"}}}}
+ "isPartOf":{{"@type":"WebSite","name":"Chittagong Board Rank","url":"{SITE}/"}}}}
 </script>
 </head>
 <body>

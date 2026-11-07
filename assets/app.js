@@ -191,7 +191,7 @@ const SEO_SITE = 'https://ctgrank.pages.dev';
 function applySeo(meta) {
   const exam = meta.exam, yr = meta.year, grp = meta.group;
   const n = meta.count.toLocaleString('en-US');
-  const title = `${exam} ${yr} ${grp} Rank List — Chattogram Board | Shikhor`;
+  const title = `${exam} ${yr} ${grp} Rank List — Chittagong Board Rank`;
   const desc = `Unofficial ${exam} ${yr} ${grp} merit list for the Chattogram Board: `
     + `${n} students from ${meta.schools} `
     + `${exam === 'HSC' ? 'colleges' : 'schools'}, ranked by GPA then total marks with `

@@ -51,7 +51,7 @@ def main():
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Tasks &amp; Habits — Shikhor</title>
+<title>Tasks &amp; Habits — Chittagong Board Rank</title>
 <meta name="description" content="A free daily planner for students: add today's tasks, line up tomorrow's, and track habits with a day counter and streak. No sign-up, nothing leaves your browser." />
 <meta name="author" content="Jahin" />
 <meta name="copyright" content="Copyright © 2026 Jahin" />
@@ -63,8 +63,8 @@ def main():
 <meta name="theme-color" content="#533afd" />
 
 <meta property="og:type" content="website" />
-<meta property="og:site_name" content="Shikhor" />
-<meta property="og:title" content="Tasks &amp; Habits — Shikhor" />
+<meta property="og:site_name" content="Chittagong Board Rank" />
+<meta property="og:title" content="Tasks &amp; Habits — Chittagong Board Rank" />
 <meta property="og:description" content="Plan today, line up tomorrow, and keep a habit going. Free, private, and no sign-up." />
 <meta property="og:url" content="{PAGE_URL}" />
 <meta property="og:image" content="{SITE}/assets/og-image.png" />
@@ -76,9 +76,9 @@ def main():
 <link rel="preload" href="assets/styles.css" as="style" />
 <link rel="stylesheet" href="assets/styles.css" />
 <script type="application/ld+json">
-{{"@context":"https://schema.org","@type":"WebPage","name":"Tasks & Habits — Shikhor",
+{{"@context":"https://schema.org","@type":"WebPage","name":"Tasks & Habits — Chittagong Board Rank",
  "url":"{PAGE_URL}","description":"A free daily task and habit tracker for students that keeps everything in the browser.",
- "isPartOf":{{"@type":"WebSite","name":"Shikhor","url":"{SITE}/"}}}}
+ "isPartOf":{{"@type":"WebSite","name":"Chittagong Board Rank","url":"{SITE}/"}}}}
 </script>
 </head>
 <body>

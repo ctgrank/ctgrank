@@ -91,7 +91,7 @@ def page(meta, index_meta, all_metas):
     inst = "colleges" if meta["exam"] == "HSC" else "schools"
     slug_ = slug(meta)
     url = "%s/%s/" % (SITE, slug_)
-    title = "%s Rank List — Chattogram Board | Shikhor" % label(meta)
+    title = "%s Rank List — Chittagong Board Rank" % label(meta)
     desc = ("%s merit list for the Chattogram Education Board: %s students from "
             "%d %s, ranked by GPA then total marks. Board rank, GPA and "
             "subject-wise "
@@ -152,7 +152,7 @@ def page(meta, index_meta, all_metas):
              "description": desc, "isPartOf": {"@id": SITE + "/#website"},
              "breadcrumb": {"@id": url + "#breadcrumb"}},
             {"@type": "BreadcrumbList", "@id": url + "#breadcrumb", "itemListElement": [
-                {"@type": "ListItem", "position": 1, "name": "Shikhor", "item": SITE + "/"},
+                {"@type": "ListItem", "position": 1, "name": "Chittagong Board Rank", "item": SITE + "/"},
                 {"@type": "ListItem", "position": 2, "name": meta["exam"],
                  "item": SITE + "/"},
                 {"@type": "ListItem", "position": 3, "name": label(meta), "item": url}]},
@@ -186,7 +186,7 @@ def page(meta, index_meta, all_metas):
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
 <link rel="canonical" href="{url}" />
 <meta property="og:type" content="website" />
-<meta property="og:site_name" content="Shikhor" />
+<meta property="og:site_name" content="Chittagong Board Rank" />
 <meta property="og:title" content="{esc(title)}" />
 <meta property="og:description" content="{esc(desc)}" />
 <meta property="og:url" content="{url}" />
@@ -224,7 +224,7 @@ def page(meta, index_meta, all_metas):
 </style>
 </head>
 <body>
-<p class="crumb"><a href="../">Shikhor</a> › {esc(meta["exam"])} › {esc(label(meta))}</p>
+<p class="crumb"><a href="../">Chittagong Board Rank</a> › {esc(meta["exam"])} › {esc(label(meta))}</p>
 
 <h1>{esc(label(meta))} Rank List — Chattogram Board</h1>
 <p>The unofficial {esc(label(meta))} merit list for the <b>Chattogram (Chittagong)
