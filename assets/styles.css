@@ -311,12 +311,30 @@ button { font: inherit; cursor: pointer; }
 }
 
 /* One clear button for every search box, including the institutions filter
-   which previously had nothing but the native control to rely on. */
-.clear-q { display: grid; place-content: center; width: 30px; height: 30px;
+   which previously had nothing but the native control to rely on.
+
+   Centred with grid, and pinned to the vertical middle of the field with
+   top/translate — the button is absolutely positioned, so the flex
+   alignment on .search does not apply to it. */
+.clear-q { position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  display: grid; place-content: center; width: 30px; height: 30px; padding: 0;
+  background: none; border: 0; color: var(--muted); border-radius: 8px;
   cursor: pointer; }
-.clear-q svg { width: 15px; height: 15px; }
+
+/* .search svg absolutely positions every icon in the box — that is what puts
+   the magnifier 13px from the left. It also matches the × here, which pulled
+   the icon out of the button's flow (and out of its grid centring), leaving
+   it hard against the top-left corner. Override it with a more specific
+   selector so the × sits centred in its own button. */
+.search .clear-q svg, .clear-q svg {
+  position: static; left: auto; top: auto; right: auto; bottom: auto;
+  width: 15px; height: 15px; display: block; }
+
 .clear-q:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
-@media (max-width: 640px) { .clear-q { width: 40px; height: 40px; } .clear-q svg { width: 17px; height: 17px; } }
+@media (max-width: 640px) {
+  .clear-q { width: 40px; height: 40px; }
+  .search .clear-q svg, .clear-q svg { width: 17px; height: 17px; }
+}
 .clear-q { position: absolute; right: 6px; background: none; border: 0; color: var(--muted); padding: 8px; border-radius: 8px; }
 .clear-q:hover { background: var(--border); color: var(--text); }
 .controls select {
