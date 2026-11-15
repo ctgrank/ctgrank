@@ -1061,6 +1061,14 @@ function wire() {
   const onQ = debounce(() => { S.q = $('#q').value; applyFilters(); writeUrl(false); }, 140);
   $('#q').addEventListener('input', () => { $('#clearQ').hidden = !$('#q').value; onQ(); });
   $('#clearQ').addEventListener('click', () => { $('#q').value = ''; $('#clearQ').hidden = true; S.q = ''; applyFilters(); writeUrl(false); $('#q').focus(); });
+  // Chrome clears type="search" on Escape by itself, without firing `input`,
+  // which would leave our × showing over an empty field.
+  $('#q').addEventListener('keydown', e => {
+    if (e.key === 'Escape' && $('#q').value) {
+      $('#q').value = ''; $('#clearQ').hidden = true;
+      S.q = ''; applyFilters(); writeUrl(false);
+    }
+  });
   $('#gpaFilter').addEventListener('change', e => { S.gpaMin = e.target.value ? +e.target.value : 0; applyFilters(); });
   $('#schoolFilter').addEventListener('change', e => { S.school = e.target.value; applyFilters(); });
   $('#chips').addEventListener('click', e => {
@@ -1109,7 +1117,23 @@ function wire() {
   });
 
   // schools
+  $('#qSchool').addEventListener('input', e => {
+    $('#qSchoolClear').hidden = !e.target.value;
+  });
   $('#qSchool').addEventListener('input', debounce(renderSchools, 140));
+  $('#qSchoolClear').addEventListener('click', () => {
+    $('#qSchool').value = '';
+    $('#qSchoolClear').hidden = true;
+    renderSchools();
+    $('#qSchool').focus();
+  });
+  $('#qSchool').addEventListener('keydown', e => {
+    if (e.key === 'Escape' && $('#qSchool').value) {
+      e.target.value = '';
+      $('#qSchoolClear').hidden = true;
+      renderSchools();
+    }
+  });
   $('#schoolSort').addEventListener('change', e => { S.schoolSort = e.target.value; renderSchools(); });
   $('#schoolBody').addEventListener('click', e => {
     const tr = e.target.closest('tr'); if (!tr) return;
