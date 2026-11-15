@@ -566,7 +566,7 @@ mark { background: color-mix(in srgb, var(--accent) 40%, transparent); color: in
 /* ── PCM merit block on the student card ── */
 .pcm-merit {
   margin: 14px 0 4px; padding: 12px 14px;
-  border: 1px solid var(--line); border-radius: 10px;
+  border: 1px solid var(--border); border-radius: 10px;
   background: color-mix(in srgb, var(--primary) 6%, transparent);
 }
 .pcm-merit-h {
@@ -600,13 +600,13 @@ mark { background: color-mix(in srgb, var(--accent) 40%, transparent); color: in
 /* ── review composer ── */
 .rev-form { display: grid; gap: 10px; }
 .rev-form.is-compact { background: var(--bg-2, #f8fafc); padding: 12px;
-  border-radius: 10px; margin: 10px 0 4px; border: 1px solid var(--line); }
+  border-radius: 10px; margin: 10px 0 4px; border: 1px solid var(--border); }
 .rev-fields { display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap; }
 .rev-field { display: grid; gap: 4px; flex: 1 1 200px; }
 .rev-field label { font-size: 12px; color: var(--muted); font-weight: 600; }
 .rev-input {
   width: 100%; padding: 9px 11px; font: inherit;
-  border: 1px solid var(--line); border-radius: 8px;
+  border: 1px solid var(--border); border-radius: 8px;
   background: var(--surface, #fff); color: var(--text);
 }
 .rev-input:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
@@ -623,7 +623,7 @@ mark { background: color-mix(in srgb, var(--accent) 40%, transparent); color: in
 /* ── review list ── */
 .rev-list { display: grid; gap: 14px; margin-top: 4px; }
 .rev-empty { color: var(--muted); margin: 4px 0; }
-.rev-card { border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
+.rev-card { border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
 .rev-card-h { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
 .rev-avatar {
   width: 36px; height: 36px; flex: 0 0 36px; border-radius: 50%;
@@ -640,7 +640,7 @@ mark { background: color-mix(in srgb, var(--accent) 40%, transparent); color: in
 .rev-reply { padding: 5px 12px; font-size: .85rem; }
 .rev-thread { display: grid; gap: 10px; margin-top: 12px; }
 .rev-comment { display: flex; gap: 10px; padding-left: 8px;
-  border-left: 2px solid var(--line); }
+  border-left: 2px solid var(--border); }
 .rev-comment .rev-avatar { width: 28px; height: 28px; flex-basis: 28px; font-size: .8rem; }
 .rev-comment-b { flex: 1; min-width: 0; }
 .rev-comment-h { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
@@ -886,22 +886,23 @@ mark { background: color-mix(in srgb, var(--accent) 40%, transparent); color: in
   border-radius: 8px; padding: 12px 16px; margin: 0; text-align: center;
 }
 
-/* each review as a centred testimonial: avatar on top, name and date under */
-.rev-card { text-align: center; }
+/* The cards sit centred on the page, but the writing inside them starts
+   from the left. Centred body copy is noticeably harder to read once it
+   runs past a line or two, and these posts can be a few sentences long. */
+.rev-card { text-align: left; }
 .rev-card-h {
-  display: flex; flex-direction: column; align-items: center; gap: 7px;
-  margin-bottom: 10px;
+  display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
 }
-.rev-who { justify-items: center; }
-.rev-text { text-align: center; }
-.rev-card-f { justify-content: center; }
+.rev-who { justify-items: start; }
+.rev-text { text-align: left; }
+.rev-card-f { justify-content: flex-start; }
 
-/* replies: the old style was a left rule with indented text */
-.rev-thread { justify-items: center; }
+/* replies: back to a left rule with the text running from the left */
+.rev-thread { justify-items: stretch; }
 .rev-comment {
-  display: flex; flex-direction: column; align-items: center; gap: 5px;
-  padding: 10px 12px; border-left: 0; border-top: 1px solid var(--line);
-  width: 100%; text-align: center;
+  display: flex; align-items: flex-start; gap: 10px;
+  padding-left: 10px; border-left: 2px solid var(--border);
+  border-top: 0; width: auto; text-align: left;
 }
 .rev-comment .rev-text { margin-bottom: 0; }
 
