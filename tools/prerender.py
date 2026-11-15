@@ -271,43 +271,6 @@ Education Board. Always confirm against your official marksheet. © 2026 Jahin.<
 """
 
 
-def inject_index_links(metas):
-    """Fill the homepage's browse directory with real <a> links, so crawlers
-    can actually reach every prerendered page."""
-    path = os.path.join(ROOT, "index.html")
-    doc = open(path, encoding="utf-8").read()
-    start, end = "<!--DATASET-LINKS:START-->", "<!--DATASET-LINKS:END-->"
-    if start not in doc:
-        return False
-    exams = {}
-    for m in metas:
-        exams.setdefault(m["exam"], []).append(m)
-    parts = []
-    for exam in ("HSC", "SSC"):
-        if exam not in exams:
-            continue
-        items = "".join(
-            # relative, so the same HTML works on Surge, GitHub Pages and a
-            # sub-path. The exam name stays in the anchor text for crawlers
-            # (sr-only) even though the card only shows year + group.
-            '<li><a href="%s/">'
-            '<span class="sr-only">%s </span>'
-            '<span class="d-year">%d</span>'
-            '<span class="d-group">%s</span>'
-            '<span class="d-meta">%s students &middot; %d %s</span>'
-            '<svg class="d-go"><use href="#i-arrow"/></svg>'
-            '</a></li>'
-            % (slug(m), m["exam"], m["year"], m["group"], f'{m["count"]:,}',
-               m["schools"], "colleges" if exam == "HSC" else "schools")
-            for m in sorted(exams[exam], key=lambda x: (-x["year"], x["group"])))
-        parts.append('<h3>%s</h3><ul class="dirlist">%s</ul>' % (exam, items))
-    block = start + "\n" + "\n".join(parts) + "\n    " + end
-    doc = re.sub(re.escape(start) + r".*?" + re.escape(end), lambda m: block, doc,
-                 count=1, flags=re.S)
-    open(path, "w", encoding="utf-8").write(doc)
-    return True
-
-
 def main():
     idx = json.load(open(os.path.join(DATA, "index.json")))
     metas = idx["datasets"]
@@ -321,8 +284,6 @@ def main():
         size = os.path.getsize(p)
         total += size
         print("  /%-24s %6.1f KB" % (slug(m) + "/", size / 1024))
-    if inject_index_links(metas):
-        print("  homepage directory updated with %d crawlable links" % len(metas))
     print("\n%d pages, %.1f MB total" % (len(metas), total / 1048576))
 
 

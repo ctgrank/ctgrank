@@ -101,6 +101,7 @@ def main():
        result — say so here. Replies are open, so questions get answered.</p>
   </section>
 
+  <div class="wrap">
   <section class="card prose rev-intro">
     <h2><svg><use href="#i-info"/></svg> Before you post</h2>
     <ul class="rev-rules">
@@ -134,6 +135,7 @@ def main():
       <p class="hint">Posting a review needs JavaScript enabled.</p>
     </noscript>
   </section>
+  </div>
 </main>
 
 {footer}
