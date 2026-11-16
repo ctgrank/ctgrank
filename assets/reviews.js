@@ -150,7 +150,7 @@
       var anonWrap = el('label', 'rev-anon');
       cb = el('input');
       cb.type = 'checkbox';
-      cb.checked = true;                 // anonymous by default
+      cb.checked = false;                // show your name unless you ask not to
       anonWrap.appendChild(cb);
       anonWrap.appendChild(el('span', null, 'Post anonymously'));
       nameRow.appendChild(anonWrap);
