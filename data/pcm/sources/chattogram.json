@@ -1,0 +1,9 @@
+{
+  "board": "chattogram",
+  "exam": "HSC",
+  "year": 2026,
+  "group": "Science",
+  "kind": "dataset",
+  "dataset": "hsc_2026_science",
+  "_note": "Chattogram HSC 2026 Science already lives in data/hsc_2026_science.json, so this source points at it instead of duplicating 17k records. Other boards are supplied as {kind:'records', students:[...]} — see tools/build_pcm.py."
+}
