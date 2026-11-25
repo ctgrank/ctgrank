@@ -455,7 +455,13 @@
     box.appendChild(el('span', null,
       ' — ' + loaded.map(function (b) { return b.label; }).join(', ') +
       '. Combined all-board ranks stay equal to single-board ranks until the ' +
-      'remaining boards are supplied.'));
+      'remaining boards are supplied. For the full eleven-board list, '));
+    var a = el('a', null, 'check EBR.BD');
+    a.href = 'https://ebr.bd/tools/pcm-rank-checker/';
+    a.target = '_blank';
+    a.rel = 'noopener';
+    box.appendChild(a);
+    box.appendChild(el('span', null, '.'));
   }
 
   function setSets(boardId) {

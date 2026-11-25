@@ -1034,6 +1034,10 @@ mark { background: color-mix(in srgb, var(--accent) 40%, transparent); color: in
 
 @media (max-width: 780px) {
   .pcm-form { grid-template-columns: 1fr; }
+  .pcm-out-btn {
+    display: flex; width: 100%; justify-content: center;
+    text-align: center; padding: 12px 14px; font-size: 13.5px;
+  }
   .pcm-go { width: 100%; }
   .pcm-row { grid-template-columns: 1fr 58px 58px; }
   .pcm-row .c-note { grid-column: 1 / -1; }
@@ -1041,3 +1045,14 @@ mark { background: color-mix(in srgb, var(--accent) 40%, transparent); color: in
   .pcm-hero-v b { font-size: 2rem; }
   .pcm-mark { flex: 1 1 44%; }
 }
+
+/* outbound pointer to the all-board list we don't compute */
+.pcm-out { border-color: color-mix(in srgb, var(--primary) 26%, var(--border)); }
+.pcm-out-btn {
+  display: inline-flex; align-items: center; gap: 8px; margin-top: 14px;
+  padding: 11px 20px; font-size: 14px;
+  max-width: 100%; white-space: normal; text-align: left; line-height: 1.35;
+}
+.pcm-out-btn svg { width: 17px; height: 17px; fill: currentColor; }
+.pcm-cover a { color: var(--primary); font-weight: 700; }
+.pcm-cover a:hover { text-decoration: underline; }
